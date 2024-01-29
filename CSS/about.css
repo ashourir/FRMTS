@@ -1,0 +1,16 @@
+.container_about {
+  margin:5em auto;
+  max-width: 80%;
+  display:flex;
+}
+
+h3 { 
+  margin-bottom:1.5em;
+}
+
+#main_museum {
+  max-width:40em;
+}
+.about__info {
+  padding-left:1em;
+}

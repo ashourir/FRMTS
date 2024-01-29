@@ -1,0 +1,124 @@
+.review-cont {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.review-form {
+    width: 50%;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.rating-section, .comment-section {
+    margin-top: 20px;
+}
+
+#rating-star-container {
+    display: inline-block;
+    font-size: 2em;
+    cursor: pointer;
+}
+
+
+.fa-star {
+    color: lightgray;
+}
+
+.fa-star.checked {
+    color: orange;
+}
+
+#comment-text {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 1.2em;
+}
+
+#submit-review-btn {
+    width: 100%;
+    border-radius: 3px;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: orange;
+    color: white;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+#character-count{
+    text-align: right;
+    color: gray;
+}
+
+#success-message {
+    color: green;
+    font-size: 18px;
+    font-weight: bold;
+}
+#comment-error-message {
+    display: none;
+    color: #f00;
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #f00;
+    border-radius: 5px;
+    background-color: #ffe6e6;
+}
+#star-error-message {
+    display: none;
+    color: #f00;
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #f00;
+    border-radius: 5px;
+    background-color: #ffe6e6;
+}
+
+#myBtn {
+    display: none;
+    position: fixed;
+    bottom: 70px;
+    right: 10px;
+    z-index: 99;
+    border-radius: 100%;
+    outline: none;
+    background-color: rgb(133, 118, 93);
+    color: white;
+    cursor: pointer;
+    padding: 0.75rem;
+    border: none;
+
+    font-size: 18px;
+}
+#myBtn:hover {
+    opacity: 60%;
+}
+
+.back-to-top-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+/*#goTo{
+    padding: 0.35em;
+    border: 1px solid white;
+    display: inline-table;
+}*/
+#goTo{
+    font: bold 15px Segoe UI;
+    text-decoration: none;
+    background-color: #88765c;
+    color: white;
+    padding: 2px 6px 2px 6px;
+    border: 1px solid #292929;
+    border-radius: 5px;
+
+}
+#navA{
+    display: inline-table;
+    margin: 5px;
+
+}

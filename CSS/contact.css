@@ -1,0 +1,22 @@
+.container {
+  width: fit-content;
+  max-width:700px;
+  margin:auto;
+}
+
+h1 {
+  margin:2em auto;
+  width:fit-content;
+}
+
+h5 {
+  padding-bottom:2em;
+}
+.mail {
+  width:fit-content;
+  margin-left:5em;
+}
+.icon {
+  width:1em;
+  margin-right:.5em;
+}

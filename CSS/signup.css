@@ -1,0 +1,39 @@
+#form__signup {
+  margin-top:100px;
+}
+#form__signup h1 {
+  margin-bottom:50px;
+}
+
+#signup {
+  margin-top:50px;
+}
+#signup_cred_form {
+  margin-top:100px;
+}
+
+.question {
+  display:flex;
+  margin:auto;
+  width:fit-content;
+  align-items:baseline;
+  cursor:pointer;
+  margin-bottom:2em;
+}
+.expand {
+  margin-left:5px;
+  width:1em;
+}
+p {
+  margin:0;
+}
+.confirmation {
+  margin-top:15em;
+}
+.form-control.is-invalid, .was-validated {
+  background-image:none;
+}
+
+
+
+

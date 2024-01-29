@@ -1,0 +1,111 @@
+#statusMessage {
+    font-size: small;
+    width: 100%;
+    /* background-color: rgb(103, 255, 103); */
+
+}
+
+#daysRemaining {
+    /* color: red; */
+    background-color: lightgray;
+    width: 100%;
+    font-size: small;
+}
+
+.container,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl,
+.container-xxl {
+    max-width: 1820px;
+}
+
+.mb-3 {
+    margin-bottom: 5vh !important;
+}
+
+.btn-save {
+    width: inherit;
+    color: black;
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #0072c6;
+    --bs-btn-border-color: #0072c6;
+    --bs-btn-hover-color: white;
+    --bs-btn-hover-bg: #137bc9;
+    --bs-btn-hover-border-color: white;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #0056a3;
+    --bs-btn-active-border-color: #0056a3;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #0072c6;
+    --bs-btn-disabled-border-color: #0072c6;
+
+}
+
+.btn-Reject {
+    width: inherit;
+    color: black;
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #b30000;
+    --bs-btn-border-color: #b30000;
+    --bs-btn-hover-color: white;
+    --bs-btn-hover-bg: #cc0000;
+    --bs-btn-hover-border-color: white;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #990000;
+    --bs-btn-active-border-color: #990000;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #b30000;
+    --bs-btn-disabled-border-color: #b30000;
+}
+
+
+.btn-complete {
+    width: inherit;
+    color: black;
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #1fbd4c;
+    --bs-btn-border-color: #1fbd4c;
+    --bs-btn-hover-color: white;
+    --bs-btn-hover-bg: #3bc35d;
+    --bs-btn-hover-border-color: white;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #10a03f;
+    --bs-btn-active-border-color: #10a03f;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #1fbd4c;
+    --bs-btn-disabled-border-color: #1fbd4c;
+}
+
+.btn-drop {
+    width: inherit;
+    color: black;
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #ffbf00;
+    --bs-btn-border-color: #ffbf00;
+    --bs-btn-hover-color: white;
+    --bs-btn-hover-bg: #ffc107;
+    --bs-btn-hover-border-color: white;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #ffbf00;
+    --bs-btn-active-border-color: #ffbf00;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #ffbf00;
+    --bs-btn-disabled-border-color: #ffbf00;
+}
+
+.modal-body>p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 23px;
+    line-height: 1.5;
+    color: #444;
+}
+
+.openseadragon-canvas {
+    background: rgb(53, 52, 52) !important;
+}

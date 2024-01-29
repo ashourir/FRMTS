@@ -1,0 +1,15 @@
+.modal_transcribed_text {
+  padding: 0em 2em 0 2em;
+}
+.row__search_bar {
+  align-items: center;
+  position:fixed;
+  width:100%;
+  z-index:99;
+}
+main {
+  margin-top:3em;
+}
+.container_completed_documents {
+  margin-top:10em;
+}

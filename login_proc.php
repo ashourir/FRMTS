@@ -3,7 +3,7 @@
 require_once('connect.php');
 require_once('./CLASSES/Volunteer.php');
 require_once('./CLASSES/Employee.php');
-require_once('./email.php');
+//require_once('./email.php');
 
 session_start();
 

@@ -290,6 +290,7 @@ class Volunteer
   public static function GetAllVolunteersFormatted()
   {
     $emails = Volunteer::GetAllActiveVolunteerEmails();
+    echo $emails;
     $volunteerEmails = "";
     foreach ($emails as $email) {
       $volunteerEmails .= "<option value='$email'>$email</option>";

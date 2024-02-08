@@ -156,6 +156,7 @@ if (isset($_GET["msg"])) {
     }
     //admin subtabs:
     function openAdminTab(evt, tabName) {
+      console.log(tabName)
       var i, aTabContent, aTabLinks;
       aTabContent = document.getElementsByClassName("aTabContent");
       for (i = 0; i < aTabContent.length; i++) {
@@ -658,18 +659,18 @@ if (isset($_GET["msg"])) {
       ?>
     </div>
 
-    <!-- Admin Section -->
-    <div id="Admin" class="tabcontent">
-      <div class="tab">
-        <button class="aTabLinks" onclick="openAdminTab(event, 'newStaff')">Add New Staff</button>
-        <button class="aTabLinks" onclick="openAdminTab(event, 'removeUser')">Remove User</button>
-        <button class="aTabLinks" onclick="openAdminTab(event, 'removeStaff')">Remove Staff</button>
-      </div>
-
-      <!-- NEW STAFF-->
-      <div id="newStaff" class="aTabContent">
-        <div>
-          <form method="post" action="add_staff_proc.php">
+   <!-- Admin Section -->
+<div id="Admin" class="tabcontent">
+  <div class="tab">
+    <button class="aTabLinks" onclick="openAdminTab(event, 'newStaff')">Add New Staff</button>
+    <button class="aTabLinks" onclick="openAdminTab(event, 'removeUser')">Remove User</button>
+    <button class="aTabLinks" onclick="openAdminTab(event, 'removeStaff')">Remove Staff</button>
+  </div>
+  
+  <!-- NEW STAFF-->
+  <div id="newStaff" class="aTabContent">
+    <div>
+    <form method="post" action="add_staff_proc.php">
             <table>
               <tr>
                 <th colspan="2">Add new employee:</th>
@@ -699,30 +700,30 @@ if (isset($_GET["msg"])) {
               </tr>
             </table>
           </form>
-        </div>
-        <span id="spnAddError">&nbsp;</span>
-        <?php
-        if (isset($_GET["addStaffMessage"])) {
-          echo "<p>" . $_GET["addStaffMessage"] . "</p>";
-        }
-        ?>
-      </div>
-
-      <!-- REMOVE USER -->
-      <div id="removeUser" class="aTabContent">
-        <div>
-          <form method="post" action="remove_user_proc.php">
-            <table>
-              <tr>
-                <th colspan="2">Remove User:</th>
-              </tr>
-              <tr>
+    </div>
+    <span id="spnAddError">&nbsp;</span>
+    <?php
+    if (isset($_GET["addStaffMessage"])) {
+      echo "<p>" . $_GET["addStaffMessage"] . "</p>";
+    }
+    ?>
+  </div>
+   
+  <!-- REMOVE USER -->
+  <div id="removeUser" class="aTabContent">
+    <div>
+      <form method="post" action="remove_user_proc.php">
+        <table>
+          <tr>
+            <th colspan="2">Remove User:</th>
+          </tr>
+          <tr>
                 <td>Select User:</td>
                 <td>
-                  <select list="dtlUser" id="userList" name="userList">
+                <select list="dtlUser" id="userList" name="userList">
                     <option value="Select a User">Select a User</option>
                     <?php
-                    echo Volunteer::GetAllVolunteersFormatted();
+                    //echo Volunteer::GetAllVolunteersFormatted();
                     ?>
                   </select>
                 </td>
@@ -730,20 +731,20 @@ if (isset($_GET["msg"])) {
               <tr>
                 <td colspan="2"><input type="submit" value="Delete User" id="btnRemoveUser" name="btnRemoveUser"></td>
               </tr>
-            </table>
-          </form>
-        </div>
-        <span id="spnDelUserError">&nbsp;</span>
-        <?php
-        if (isset($_GET["removeUserMessage"])) {
-          echo "<p>" . $_GET["removeUserMessage"] . "</p>";
-        }
-        ?>
-      </div>
-
-      <!-- REMOVE STAFF -->
-      <div id="removeStaff" class="aTabContent">
-        <div>
+        </table>
+      </form>
+    </div>
+    <span id="spnDelUserError">&nbsp;</span>
+    <?php
+    if (isset($_GET["removeUserMessage"])) {
+      echo "<p>" . $_GET["removeUserMessage"] . "</p>";
+    }
+    ?>
+  </div>
+  
+  <!-- REMOVE STAFF -->
+  <div id="removeStaff" class="aTabContent">
+  <div>
           <form method="post" action="remove_staff_proc.php">
             <table>
               <tr>
@@ -755,7 +756,7 @@ if (isset($_GET["msg"])) {
                   <select id="staffList" name="staffList">
                     <option value="Select a Staff Member">Select a Staff Member</option>
                     <?php
-                    echo Employee::GetAllEmployeesFormatted();
+                   // echo Employee::GetAllEmployeesFormatted();
                     ?>
                   </select>
                 </td>
@@ -772,8 +773,9 @@ if (isset($_GET["msg"])) {
           echo "<p>" . $_GET["removeStaffMessage"] . "</p>";
         }
         ?>
-      </div>
-    </div>
+  </div>
+</div>
+
 
 
   </main>

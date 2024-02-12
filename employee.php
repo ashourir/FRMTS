@@ -723,7 +723,7 @@ if (isset($_GET["msg"])) {
                 <select list="dtlUser" id="userList" name="userList">
                     <option value="Select a User">Select a User</option>
                     <?php
-                    //echo Volunteer::GetAllVolunteersFormatted();
+                      echo Volunteer::GetAllVolunteersFormatted();
                     ?>
                   </select>
                 </td>
@@ -756,7 +756,7 @@ if (isset($_GET["msg"])) {
                   <select id="staffList" name="staffList">
                     <option value="Select a Staff Member">Select a Staff Member</option>
                     <?php
-                   // echo Employee::GetAllEmployeesFormatted();
+                       echo Employee::GetAllEmployeesFormatted();
                     ?>
                   </select>
                 </td>

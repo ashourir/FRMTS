@@ -277,25 +277,25 @@ class Volunteer
     $result = $stmt->get_result();
     $rows = $result->fetch_all(MYSQLI_ASSOC);
     if ($result->num_rows > 0) {
-      foreach ($rows as $row) {
-        $email = $row["email"];
-        array_push($emailArray, $email);
-      }
+        foreach ($rows as $row) {
+            $email = $row["email"];
+            array_push($emailArray, $email);
+        }
     }
     return $emailArray;
-  }
+}
+
 
   //JEFFERY
   //calls the function to get all active Volunteer emails and returns a formatted string for options in a select box to employee.php
   public static function GetAllVolunteersFormatted()
   {
     $emails = Volunteer::GetAllActiveVolunteerEmails();
-    echo $emails;
     $volunteerEmails = "";
     foreach ($emails as $email) {
       $volunteerEmails .= "<option value='$email'>$email</option>";
     }
-    return $volunteerEmails;
+    return "$volunteerEmails";
   }
 
   //  JEREMY

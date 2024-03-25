@@ -295,7 +295,6 @@ class Document
     $stmt->bind_param('s', $docId);
     $stmt->execute();
     $result = $stmt->get_result();
-
     if ($result->num_rows == 0) {
       return "invalid document";
     } else {
@@ -309,6 +308,7 @@ class Document
       $document->numPages = $pages;
       $document->description = $desc;
       $document->textFilePath = $textFile;
+
       return $document;
     } //end else 
   } //end getDocument
@@ -701,6 +701,62 @@ class Document
     $stmt->close();
     return $status;
   }
+
+  public static function GetAllAvailableDocumentsEmployeesAsHtmlTable(){
+    global $con;
+    $stmt = $con->prepare('CALL GetAllAvailableDocumentsEmployees()');
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $html = '<table class="table">';
+    $html .= '<thead class="thead-dark"><tr><th>Document ID</th><th>Document</th><th>Employee</th><th>Status</th><th>Action</th></tr></thead>';
+    $html .= '<tbody>';
+    while ($row = $result->fetch_assoc()) {
+        $html .= '<tr>';
+        $html .= '<td>' . $row['documentId'] . '</td>';
+        $html .= '<td>' . $row['name'] . '</td>';
+        $html .= '<td>' . $row['username'] . '</td>';
+        $html .= '<td>' . $row['documentStatus'] . '</td>';
+        $html .= '<td><button type="button" onclick="GenerateReassignModal(\'emp\', \'' . $row['employeeId'] . '\', \'' . $row['documentId'] . '\')" class="btn btn-dark">Reassign task</button></td>';        $html .= '</tr>';
+    }
+    $html .= '</tbody>';
+    $html .= '</table>';
+
+    return $html;
+}
+
+public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
+  global $con;
+  $stmt = $con->prepare('CALL GetAllAvailableDocumentsVolunteers()');
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  $html = '<table class="table">';
+  $html .= '<thead class="thead-dark"><tr><th>Document ID</th><th>Document</th><th>Volunteer</th><th>Status</th><th>Action</th></tr></thead>';
+  $html .= '<tbody>';
+  while ($row = $result->fetch_assoc()) {
+      $html .= '<tr>';
+      $html .= '<td>' . $row['documentId'] . '</td>';
+      $html .= '<td>' . $row['name'] . '</td>';
+      $html .= '<td>' . $row['email'] . '</td>';
+      $html .= '<td>' . $row['documentStatus'] . '</td>';
+      $html .= '<td><button type="button" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\')" class="btn btn-dark">Reassign task</button></td>';      $html .= '</tr>';
+  }
+  $html .= '</tbody>';
+  $html .= '</table>';
+
+  return $html;
+}
+
+//Alex
+public static function ReassignDocument($prevId, $actualEmpId, $documentId, $mode, $targetRole){
+  global $con;
+
+  $stmt = $con->prepare("CALL ReassignActiveDocId(?, ?, ?, ?, ?)");
+  $stmt->bind_param("iiiss", $prevId, $actualEmpId, $documentId, $mode, $targetRole);
+  $stmt->execute();
+  $stmt->close();
+}
 
 
 

@@ -284,6 +284,22 @@ class Volunteer
     }
     return $emailArray;
 }
+//Alex
+public static function GetUnassignedVolunteerEmails(){
+  global $con;
+  $emailArray = array();
+  $stmt = $con->prepare("CALL GetUnassignedVolunteers()");
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $rows = $result->fetch_all(MYSQLI_ASSOC);
+  if ($result->num_rows > 0) {
+      foreach ($rows as $row) {
+          $volunteers = ["volunteerId" => $row["volunteerId"], "email" => $row["email"]];
+          array_push($emailArray, $volunteers);
+      }
+  }
+  return $emailArray;
+}
 
 
   //JEFFERY
@@ -296,6 +312,16 @@ class Volunteer
       $volunteerEmails .= "<option value='$email'>$email</option>";
     }
     return "$volunteerEmails";
+  }
+  //Alex
+  public static function GetUnassignedVolunteersFormatted()
+  {
+    $volunteers = Volunteer::GetUnassignedVolunteerEmails();
+    $volunteerOptions = "";
+    foreach ($volunteers as $volunteer) {
+        $volunteerOptions .= "<option value='{$volunteer["volunteerId"]}'>{$volunteer["email"]}</option>";
+    }
+    return $volunteerOptions;
   }
 
   //  JEREMY

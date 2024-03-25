@@ -171,9 +171,14 @@ function validateRemoveUserCheck(evt) {
   } 
 
   function goToTranscriptionPage() {
+    document.querySelector('#modal_choose_doc').addEventListener('click', ((e)=>{
+      e.preventDefault()
+    }))
+  
     $('#modal_choose_doc').on('click', () => {
       let docId = $('#hidden_id').val();
       // $.redirect('transcription.php', {employeeDocId: docId});
+      
 
       $.ajax({
         type: "POST",
@@ -184,6 +189,7 @@ function validateRemoveUserCheck(evt) {
         success: function(response) {
 
           (response == 1) ? $.redirect("transcription.php") : $.redirect("employee.php");
+          
 
         }
       });

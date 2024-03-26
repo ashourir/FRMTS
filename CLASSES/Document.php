@@ -740,8 +740,9 @@ public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
       $html .= '<td>' . $row['name'] . '</td>';
       $html .= '<td>' . $row['email'] . '</td>';
       $html .= '<td>' . $row['documentStatus'] . '</td>';
-      $html .= '<td><button type="button" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\')" class="btn btn-dark">Reassign task</button></td>';      $html .= '</tr>';
-  }
+      $html .= '<td><button type="button" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\', \'' . $row['statusId'] . '\')" class="btn btn-dark">Reassign task</button></td>';
+$html .= '</tr>';
+    }
   $html .= '</tbody>';
   $html .= '</table>';
 
@@ -749,11 +750,11 @@ public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
 }
 
 //Alex
-public static function ReassignDocument($prevId, $actualEmpId, $documentId, $mode, $targetRole){
+public static function ReassignDocument($prevId, $actualEmpId, $documentId, $mode, $targetRole, $statusId){
   global $con;
 
-  $stmt = $con->prepare("CALL ReassignActiveDocId(?, ?, ?, ?, ?)");
-  $stmt->bind_param("iiiss", $prevId, $actualEmpId, $documentId, $mode, $targetRole);
+  $stmt = $con->prepare("CALL ReassignActiveDocId(?, ?, ?, ?, ?, ?, @result)");
+  $stmt->bind_param("iiissi", $prevId, $actualEmpId, $documentId, $mode, $targetRole, $statusId);
   $stmt->execute();
   $stmt->close();
 }

@@ -219,7 +219,7 @@ if (isset($_GET["msg"])) {
         }
     }
     //Reasign function
-    async function GenerateReassignModal(mode, id, documentId){
+    async function GenerateReassignModal(mode, id, documentId, statusId){
       let selectedId, targetRole
       let modal = document.querySelector("#reassignModal")
       modal.showModal()
@@ -266,7 +266,7 @@ if (isset($_GET["msg"])) {
       }
       if (selcEmployee.value || selcVolunteer.value) {
         selectedId = selcEmployee.value || selcVolunteer.value;
-        ReassignEmployee(id, selectedId, documentId, mode, targetRole);
+        ReassignEmployee(id, selectedId, documentId, mode, targetRole, statusId);
       } else {
         alert("Please select an employee or volunteer.");
       }
@@ -276,13 +276,14 @@ if (isset($_GET["msg"])) {
 }
     
       
-    async function ReassignEmployee(prevId, currentId, documentId ,mode, targetRole){
+    async function ReassignEmployee(prevId, currentId, documentId ,mode, targetRole, statusId){
         let data = {
           prevId,
           currentId,
           documentId,
           mode,
-          targetRole
+          targetRole,
+          statusId
         }
         try{
           let response = await fetch('reassignDocument_proc.php', {

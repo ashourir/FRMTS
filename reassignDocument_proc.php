@@ -10,8 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $documentId = $data['documentId'];
     $mode = $data['mode'];
     $targetRole = $data['targetRole'];
+    $statusId = $data['statusId'];
 
-    Document::ReassignDocument($prevId, $actualEmpId, $documentId, $mode, $targetRole);
+    Document::ReassignDocument($prevId, $actualEmpId, $documentId, $mode, $targetRole, $statusId);
 
     echo json_encode(["message" => "Document reassigned successfully"]);
 } else {

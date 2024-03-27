@@ -315,7 +315,8 @@ if (isset($_GET["msg"])) {
     //Alex
     //Ajax call to get the remaning time for each document in the admin table
     async function GetTimeRemaining(id){
-      let response = await fetch('timeRemaining_proc.php', {
+      try{
+        let response = await fetch('timeRemaining_proc.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -329,16 +330,23 @@ if (isset($_GET["msg"])) {
       data = await response.json()
       document.querySelector("#timeRemain"+id).innerHTML = data.timeRemaining + " Days"
       let circleStatus = document.querySelector("#circleStatus"+id)
-      circleStatus.classList.remove("bg-danger")
-      circleStatus.classList.add("bg-warning")
-      if(data.timeRemaining < 5 ){
-        circleStatus.classList.remove("bg-warning")
-        circleStatus.classList.add("bg-danger")
-
+      if (data.timeRemaining <= 15) {
+        if(data.timeRemaining <= 5){
+          circleStatus.innerHTML += `<img src='./IMAGES/ICONS/red-circle.png'></img>`;
+        }
+        else {
+          circleStatus.innerHTML += `<img src='./IMAGES/ICONS/yellow-circle.png'></img>`;
+        }
       }
+      
+      
+    } 
 
-     
     }
+    catch(err){
+        alert('Something went wrong!')
+        window.location.reload(true)
+      }
     }
   </script>
 

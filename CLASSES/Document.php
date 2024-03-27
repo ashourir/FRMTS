@@ -736,7 +736,7 @@ public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
   $html .= '<tbody>';
   while ($row = $result->fetch_assoc()) {
       $html .= '<tr>';
-      $html .= '<td id="circletatus'.$row['volunteerId'].'">' . $row['documentId'] . '</td>';
+      $html .= '<td class= "mx-auto my-auto"><span class="h-25 w-25" id="circleStatus'.$row['volunteerId'].'"></span> ' . $row['documentId'] .  '</td>';
       $html .= '<td>' . $row['name'] . '</td>';
       $html .= '<td>' . $row['email'] . '</td>';
       $html .= '<td>' . $row['documentStatus'] . '</td>';

@@ -311,6 +311,35 @@ if (isset($_GET["msg"])) {
         }
         
     }
+
+    //Alex
+    //Ajax call to get the remaning time for each document in the admin table
+    async function GetTimeRemaining(id){
+      let response = await fetch('timeRemaining_proc.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ volunteerId: id })
+    });
+    if(!response.ok){
+      document.querySelector("#timeRemain"+id).innerHTML = '-'
+    }
+    else {
+      data = await response.json()
+      document.querySelector("#timeRemain"+id).innerHTML = data.timeRemaining + " Days"
+      let circleStatus = document.querySelector("#circleStatus"+id)
+      circleStatus.classList.remove("bg-danger")
+      circleStatus.classList.add("bg-warning")
+      if(data.timeRemaining < 5 ){
+        circleStatus.classList.remove("bg-warning")
+        circleStatus.classList.add("bg-danger")
+
+      }
+
+     
+    }
+    }
   </script>
 
 </head>

@@ -368,6 +368,20 @@ public static function GetUnassignedVolunteerEmails(){
     $stmt->close();
     return $historyId;
   }
+  //Alex
+  public static function GetActiveHistoryId(int $volunteerId)
+{
+    global $con;
+    $stmt = $con->prepare('CALL GetActiveDocumentId(?)');
+    $stmt->bind_param('i', $volunteerId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_row();
+    $historyId = $row[1] ?? -1; // Use index 1 to fetch the second column (historyId)
+    $stmt->close();
+    return $historyId;
+}
+  
 
 
 

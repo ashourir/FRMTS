@@ -732,16 +732,19 @@ public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
   $result = $stmt->get_result();
 
   $html = '<table class="table">';
-  $html .= '<thead class="thead-dark"><tr><th>Document ID</th><th>Document</th><th>Volunteer</th><th>Status</th><th>Action</th></tr></thead>';
+  $html .= '<thead class="thead-dark"><tr><th>Document ID</th><th>Document</th><th>Volunteer</th><th>Status</th><th>Action</th><th>Remain</th></tr></thead>';
   $html .= '<tbody>';
   while ($row = $result->fetch_assoc()) {
       $html .= '<tr>';
-      $html .= '<td>' . $row['documentId'] . '</td>';
+      $html .= '<td id="circletatus'.$row['volunteerId'].'">' . $row['documentId'] . '</td>';
       $html .= '<td>' . $row['name'] . '</td>';
       $html .= '<td>' . $row['email'] . '</td>';
       $html .= '<td>' . $row['documentStatus'] . '</td>';
       $html .= '<td><button type="button" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\', \'' . $row['statusId'] . '\')" class="btn btn-dark">Reassign task</button></td>';
-$html .= '</tr>';
+      $html .= '<td id="timeRemain'.$row['volunteerId'].'"></td>';
+      echo '<script>GetTimeRemaining("'.$row['volunteerId'].'")</script>';
+      $html .= '</tr>';
+      
     }
   $html .= '</tbody>';
   $html .= '</table>';

@@ -266,6 +266,7 @@ if (isset($_GET["msg"])) {
       }
       if (selcEmployee.value || selcVolunteer.value) {
         selectedId = selcEmployee.value || selcVolunteer.value;
+       // console.log(id, selectedId, documentId, mode, targetRole, statusId)
         ReassignEmployee(id, selectedId, documentId, mode, targetRole, statusId);
       } else {
         alert("Please select an employee or volunteer.");
@@ -314,7 +315,7 @@ if (isset($_GET["msg"])) {
 
     //Alex
     //Ajax call to get the remaning time for each document in the admin table
-    async function GetTimeRemaining(id){
+    async function GetTimeRemaining(id, documentId){
       try{
         let response = await fetch('timeRemaining_proc.php', {
       method: 'POST',
@@ -331,8 +332,13 @@ if (isset($_GET["msg"])) {
       document.querySelector("#timeRemain"+id).innerHTML = data.timeRemaining + " Days"
       let circleStatus = document.querySelector("#circleStatus"+id)
       if (data.timeRemaining <= 15) {
-        if(data.timeRemaining <= 5){
+        if(data.timeRemaining <= 0){
+            await ReturnDocument(documentId)
+
+        }
+        else if(data.timeRemaining <= 5){
           circleStatus.innerHTML += `<img src='./IMAGES/ICONS/red-circle.png'></img>`;
+
         }
         else {
           circleStatus.innerHTML += `<img src='./IMAGES/ICONS/yellow-circle.png'></img>`;
@@ -344,8 +350,34 @@ if (isset($_GET["msg"])) {
 
     }
     catch(err){
-        alert('Something went wrong!')
-        window.location.reload(true)
+        console.log(err)
+        //window.location.reload(true)
+      }
+    }
+
+    //Alex
+    //Ajax function to return the document when it overdue
+    async function ReturnDocument(documentId){
+      try{
+          let response = await fetch('returnDocument_proc.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ documentId: documentId})
+          })
+          if(response.ok){
+            let data = await response.json();
+            if(data.success){
+              let row = document.querySelector(`#tableRow${documentId}`)
+              row.remove()
+              alert(`Document: ${documentId} has been returned to the pool`)
+            }
+          }
+      }
+      catch(err){
+        console.log(err)
+        alert("Returning Document attempt failed.")
       }
     }
   </script>

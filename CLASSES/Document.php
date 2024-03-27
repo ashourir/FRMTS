@@ -735,14 +735,14 @@ public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
   $html .= '<thead class="thead-dark"><tr><th>Document ID</th><th>Document</th><th>Volunteer</th><th>Status</th><th>Action</th><th>Remain</th></tr></thead>';
   $html .= '<tbody>';
   while ($row = $result->fetch_assoc()) {
-      $html .= '<tr>';
+    $html .= '<tr id="tableRow'.$row['documentId'].'">';
       $html .= '<td class= "mx-auto my-auto"><span class="h-25 w-25" id="circleStatus'.$row['volunteerId'].'"></span> ' . $row['documentId'] .  '</td>';
       $html .= '<td>' . $row['name'] . '</td>';
       $html .= '<td>' . $row['email'] . '</td>';
       $html .= '<td>' . $row['documentStatus'] . '</td>';
       $html .= '<td><button type="button" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\', \'' . $row['statusId'] . '\')" class="btn btn-dark">Reassign task</button></td>';
       $html .= '<td id="timeRemain'.$row['volunteerId'].'"></td>';
-      echo '<script>GetTimeRemaining("'.$row['volunteerId'].'")</script>';
+      echo '<script>GetTimeRemaining("' . $row['volunteerId'] . '","' . $row['documentId'] . '")</script>';
       $html .= '</tr>';
       
     }
@@ -760,6 +760,7 @@ public static function ReassignDocument($prevId, $actualEmpId, $documentId, $mod
   $stmt->bind_param("iiissi", $prevId, $actualEmpId, $documentId, $mode, $targetRole, $statusId);
   $stmt->execute();
   $stmt->close();
+  return $documentId;
 }
 
 

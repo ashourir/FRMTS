@@ -12,8 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $targetRole = $data['targetRole'];
     $statusId = $data['statusId'];
 
-    Document::ReassignDocument($prevId, $actualEmpId, $documentId, $mode, $targetRole, $statusId);
-
+    $result = Document::ReassignDocument($prevId, $actualEmpId, $documentId, $mode, $targetRole, $statusId);
+    echo $result;
     echo json_encode(["message" => "Document reassigned successfully"]);
 } else {
     http_response_code(405);

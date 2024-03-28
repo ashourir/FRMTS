@@ -233,11 +233,13 @@ if (isset($_GET["msg"])) {
       let volContent = "<?php echo Volunteer::GetUnassignedVolunteersFormatted() ?>"
       let selcVolunteer = document.querySelector("#volSelect")
       selcVolunteer.innerHTML += volContent
+      let btnReturn = document.querySelector('#btnReturn')
 
       let btnCancel = document.querySelector("#btnCancel")
-      btnCancel.addEventListener('click', ()=>{
+      btnCancel.addEventListener('click', function cancelModal(){
         modal.close()
         btnConfirm.removeEventListener('click', confirmClick)
+        btnReturn.removeEventListener('click', evtReturnDocument)
         selcEmployee.innerHTML = "<option value=''>Employee List</option>"
         selcVolunteer.innerHTML = "<option value=''>Volunteer List</option>"
       })
@@ -256,9 +258,15 @@ if (isset($_GET["msg"])) {
         targetRole = "volunteer"
        }
     });
-      
-      
-      
+    //event listener to the Return document button
+    
+    if(btnReturn){
+      btnReturn.addEventListener('click', evtReturnDocument)
+    }
+    function evtReturnDocument(){
+      ReturnDocument(documentId)
+      btnCancel.click()
+    }
 
       let confirmClick = () =>{
         if(selcEmployee.value || selcVolunteer.value){
@@ -314,7 +322,7 @@ if (isset($_GET["msg"])) {
     }
 
     //Alex
-    //Ajax call to get the remaning time for each document in the admin table
+    //Ajax call to get the remaining time for each document in the admin table
     async function GetTimeRemaining(id, documentId){
       try{
         let response = await fetch('timeRemaining_proc.php', {
@@ -351,12 +359,12 @@ if (isset($_GET["msg"])) {
     }
     catch(err){
         console.log(err)
-        //window.location.reload(true)
+        window.location.reload(true)
       }
     }
 
     //Alex
-    //Ajax function to return the document when it overdue
+    //Ajax function to return the document when it's overdue
     async function ReturnDocument(documentId){
       try{
           let response = await fetch('returnDocument_proc.php', {
@@ -373,6 +381,9 @@ if (isset($_GET["msg"])) {
               row.remove()
               alert(`Document: ${documentId} has been returned to the pool`)
             }
+          }
+          else {
+            alert("Returning Document attempt failed.")
           }
       }
       catch(err){
@@ -891,6 +902,7 @@ if (isset($_GET["msg"])) {
           <div class="mx-2">
             <button id="btnConfirm" type='button' class='btn btn-dark'>Confirm</button>
             <button id="btnCancel" type='button' class='btn btn-dark'>Cancel</button>
+            <button id="btnReturn" type='button' class='btn btn-danger'>Return Document</button>
           </div>
       </div>
       </dialog>

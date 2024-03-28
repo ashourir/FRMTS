@@ -272,7 +272,7 @@ class Volunteer
   public static function GetAllActiveVolunteerEmails(){
     global $con;
     $emailArray = array();
-    $stmt = $con->prepare("CALL GetAllActiveVolunteerEmails()");
+    $stmt = $con->prepare("CALL GetAllActiveVolunteerEmails()"); 
     $stmt->execute();
     $result = $stmt->get_result();
     $rows = $result->fetch_all(MYSQLI_ASSOC);

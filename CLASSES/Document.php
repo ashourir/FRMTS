@@ -737,7 +737,7 @@ public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
   while ($row = $result->fetch_assoc()) {
     $html .= '<tr id="tableRow'.$row['documentId'].'">';
       $html .= '<td class= "mx-auto my-auto"><span class="h-25 w-25" id="circleStatus'.$row['volunteerId'].'"></span> ' . $row['documentId'] .  '</td>';
-      $html .= '<td>' . $row['name'] . '</td>';
+      $html .= '<td onclick="populateViewTranscription(\'' . $row['documentId'] . '\')" id="tdDocId' . $row['documentId'] . '" style="cursor: pointer;">' . $row['name'] . '</td>';
       $html .= '<td>' . $row['email'] . '</td>';
       $html .= '<td>' . $row['documentStatus'] . '</td>';
       $html .= '<td><button type="button" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\', \'' . $row['statusId'] . '\')" class="btn btn-dark">Reassign task</button></td>';

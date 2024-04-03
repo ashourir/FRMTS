@@ -161,3 +161,4 @@ function saveFileContents($text, $fileName, $option)
   fwrite($file, $text);
   fclose($file);
 }
+

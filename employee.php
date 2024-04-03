@@ -103,6 +103,8 @@ if (isset($_GET["msg"])) {
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
   <?php include("e_head.php"); ?>
   <link rel="stylesheet" href="./CSS/employee.css">
+  <script src="./JS/openseadragon/openseadragon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
   <script>
     //Tabs stuff
     function openTab(evt, tabName) {
@@ -391,6 +393,124 @@ if (isset($_GET["msg"])) {
         alert("Returning Document attempt failed.")
       }
     }
+
+    //Alex
+    //Events listeners to see documents when admin clicks its name
+    function docNamesEventListeners(docId){
+      let td = document.querySelector("#tdDocId"+docId)
+      td.addEventListener('click', ()=>{
+        populateViewTranscription(docId)
+      })
+
+    }
+
+    async function getFolderName(docId){
+      try{
+        let response = await fetch('getDocumentFolder.php', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+            },
+          body: JSON.stringify({documentId: docId})
+        })
+        
+     
+       if(response.ok){
+          let folderName = await response.json()
+         
+          return folderName
+        }
+      }
+      catch(err){
+        console.log(err)
+      }
+    }
+    
+       async function populateViewTranscription(docId){
+          let modal = document.querySelector("#modalViewTransc")
+          let txtDesc = document.querySelector("#txtDesc")
+          let txtNotes = document.querySelector("#txtNotes")
+          let folderName = await getFolderName(docId)
+          modal.showModal()
+          //add event listener to close the modal
+          let btnClose = document.querySelector('#btnDocClose')
+          btnClose.addEventListener('click', ()=>{
+            document.querySelector('#openseadragon1').innerHTML = ''
+            modal.close()
+          })
+          $.ajax({
+    type: "POST",
+    url: "transcription_proc.php",
+    data: {
+     
+      createOSDCanva: folderName
+    },
+    // dataType: "dataType",
+    success: (arrayOfImages) => {
+      let formatedImagesArray = createImageArray(arrayOfImages);
+      var viewer = createOSDViewer(formatedImagesArray);
+      let transcription = joinTranscText(arrayOfImages, 'transc')
+      txtDesc.innerHTML = transcription
+      let notes = joinTranscText(arrayOfImages, 'notes')
+      txtNotes.innerHTML = notes
+
+     
+    }
+  })
+
+      }
+    
+    
+      //function to create formatted array of images
+      function createImageArray(arrayOfImages) {
+       
+  let formatedImagesArray = [];
+  let resParsed = JSON.parse(arrayOfImages);
+  resParsed.images.forEach(path => {
+    formatedImagesArray.push(
+      {
+        type: "image",
+        url: path
+      }
+    )
+  });
+  return formatedImagesArray;
+}
+
+//function to create viewer
+function createOSDViewer(images) {
+  //create the openseadragon viewer
+  var viewer = OpenSeadragon({
+    id: 'openseadragon1',
+    prefixUrl: './JS/openseadragon/images/',
+    showNavigator: true,
+    navigatorPosition: 'TOP_RIGHT',
+    showSequenceControl: true,
+    nextButton: 'btnNext',
+    previousButton: 'btnPrev',
+    tileSources: images,
+    sequenceMode: true,
+    showReferenceStrip: true,
+    maxZoomPixelRatio: 5,
+    minZoomLevel: 0,
+    defaultZoomLevel: 0,
+    // debugMode: true
+  });
+  return viewer;
+}
+
+
+function joinTranscText(imagesObj, mode) {
+ let obj = JSON.parse(imagesObj) //it takes the string formart and converts it to JS obj
+    if(mode === 'transc'){
+      obj.transcText[0] = obj.transcText[0].replace(/^\n/, '');
+    return obj.transcText.reduce((acc, text) => acc + text, '');
+    }
+    else if (mode === 'notes'){
+      obj.notesText[0] = obj.notesText[0].replace(/^\n/, '');
+    return obj.notesText.reduce((acc, text) => acc + text)}
+    
+}
   </script>
 
 </head>
@@ -878,7 +998,18 @@ if (isset($_GET["msg"])) {
     <button class="aTabLinks" onclick="openAdminTab(event, 'tasks')">Tasks</button>
 
   </div>
-
+  <!-- View current Transcription Dialog-->
+  <dialog id="modalViewTransc">
+    <div class="d-flex justify-content-around align-items-center mx-2">
+      <div id="openseadragon1" style="width: 800px; height: 600px;"></div>
+      <div class="d-flex flex-column my-2 mx-2 h-100 w-100">
+        <textarea readonly rows="15" class="my-2" id='txtDesc'></textarea>
+        <textarea readonly rows="5" class="my-2" id='txtNotes'></textarea>
+        <button id="btnDocClose" class="btn btn-dark">Close</button>
+      </div>
+    </div>
+      
+  </dialog>
   <!-- Tasks-->
   <div id="tasks" class="aTabContent">
       <button class="aTabLinks" onclick="generateDocTable(event, 'empTable')">Employees</button>

@@ -702,7 +702,7 @@ class Document
     return $status;
   }
 
-  public static function GetAllAvailableDocumentsEmployeesAsHtmlTable(){
+  /*public static function GetAllAvailableDocumentsEmployeesAsHtmlTable(){
     global $con;
     $stmt = $con->prepare('CALL GetAllAvailableDocumentsEmployees()');
     $stmt->execute();
@@ -724,6 +724,7 @@ class Document
 
     return $html;
 }
+*/
 
 public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
   global $con;
@@ -731,23 +732,30 @@ public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
   $stmt->execute();
   $result = $stmt->get_result();
 
-  $html = '<table class="table">';
-  $html .= '<thead class="thead-dark"><tr><th>Document ID</th><th>Document</th><th>Volunteer</th><th>Status</th><th>Action</th><th>Remain</th></tr></thead>';
+  $html = '<table class="table table-striped ">';
+  $html .= '<thead class="table-dark"><tr><th>Document ID</th><th>Document</th><th>Volunteer</th><th>Status</th><th>Remaining</th><th>Action</th></tr></thead>';
   $html .= '<tbody>';
   while ($row = $result->fetch_assoc()) {
     $html .= '<tr id="tableRow'.$row['documentId'].'">';
-      $html .= '<td class= "mx-auto my-auto"><span class="h-25 w-25" id="circleStatus'.$row['volunteerId'].'"></span> ' . $row['documentId'] .  '</td>';
-      $html .= '<td onclick="populateViewTranscription(\'' . $row['documentId'] . '\')" id="tdDocId' . $row['documentId'] . '" style="cursor: pointer;">' . $row['name'] . '</td>';
-      $html .= '<td>' . $row['email'] . '</td>';
-      $html .= '<td>' . $row['documentStatus'] . '</td>';
-      $html .= '<td><button type="button" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\', \'' . $row['statusId'] . '\')" class="btn btn-dark">Reassign task</button></td>';
-      $html .= '<td id="timeRemain'.$row['volunteerId'].'"></td>';
-      echo '<script>GetTimeRemaining("' . $row['volunteerId'] . '","' . $row['documentId'] . '")</script>';
-      $html .= '</tr>';
-      
-    }
-  $html .= '</tbody>';
-  $html .= '</table>';
+    $html .= '<td class="mx-auto my-auto"><span class="h-25 w-25" id="circleStatus'.$row['volunteerId'].'"></span> ' . $row['documentId'] .  '</td>';
+    $html .= '<td onclick="populateViewTranscription(\'' . $row['documentId'] . '\')" id="tdDocId' . $row['documentId'] . '" style="cursor: pointer;">' . $row['name'] . '</td>';
+    $html .= '<td>' . $row['email'] . '</td>';
+    $html .= '<td>' . $row['documentStatus'] . '</td>';
+    $html .= '<td id="timeRemain'.$row['volunteerId'].'"></td>';
+    $html .= '<td class="dropdown">';
+    $html .= '<button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton'.$row['documentId'].'" data-bs-toggle="dropdown" aria-expanded="false">Actions</button>';
+    $html .= '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton'.$row['documentId'].'">';
+    $html .= '<li><a class="dropdown-item" href="#" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\', \'' . $row['statusId'] . '\')">Reassign task</a></li>';
+    $html .= '<li><a class="dropdown-item" href="#" onclick="ViewWorkDoneByVolunteer(\'' . $row['volunteerId'] . '\')">View work done by user</a></li>';
+    $html .= '</ul>';
+    $html .= '</td>';
+
+    echo '<script>GetTimeRemaining("' . $row['volunteerId'] . '","' . $row['documentId'] . '")</script>';
+    $html .= '</tr>';
+}
+$html .= '</tbody>';
+$html .= '</table>';
+
 
   return $html;
 }

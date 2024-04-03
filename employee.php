@@ -270,13 +270,16 @@ if (isset($_GET["msg"])) {
       btnCancel.click()
     }
 
+    modal.addEventListener('cancel', (event)=> {
+            event.preventDefault()
+          })
+
       let confirmClick = () =>{
         if(selcEmployee.value || selcVolunteer.value){
         selectedId = selcEmployee.value || selcVolunteer.value;
       }
       if (selcEmployee.value || selcVolunteer.value) {
         selectedId = selcEmployee.value || selcVolunteer.value;
-       // console.log(id, selectedId, documentId, mode, targetRole, statusId)
         ReassignEmployee(id, selectedId, documentId, mode, targetRole, statusId);
       } else {
         alert("Please select an employee or volunteer.");
@@ -393,6 +396,8 @@ if (isset($_GET["msg"])) {
         alert("Returning Document attempt failed.")
       }
     }
+    
+
 
     //Alex
     //Events listeners to see documents when admin clicks its name
@@ -425,13 +430,41 @@ if (isset($_GET["msg"])) {
         console.log(err)
       }
     }
+
+    async function getDocName(docId){
+      try{
+        let response = await fetch('getDocumentById.php', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+            },
+          body: JSON.stringify({documentId: docId})
+        })
+        
+     
+       if(response.ok){
+          let docName = await response.json()
+         
+          return docName
+        }
+      }
+      catch(err){
+        console.log(err)
+      }
+    }
     
        async function populateViewTranscription(docId){
           let modal = document.querySelector("#modalViewTransc")
+         
           let txtDesc = document.querySelector("#txtDesc")
           let txtNotes = document.querySelector("#txtNotes")
           let folderName = await getFolderName(docId)
+          let docName = await getDocName(docId)
           modal.showModal()
+          modal.addEventListener('cancel', (event)=> {
+            event.preventDefault()
+          })
+          document.querySelector('#lblDocName').innerText = docName
           //add event listener to close the modal
           let btnClose = document.querySelector('#btnDocClose')
           btnClose.addEventListener('click', ()=>{
@@ -510,6 +543,58 @@ function joinTranscText(imagesObj, mode) {
       obj.notesText[0] = obj.notesText[0].replace(/^\n/, '');
     return obj.notesText.reduce((acc, text) => acc + text)}
     
+}
+
+
+//Alex Function to visualize work done by volunteer
+
+async function fetchHistory(volunteerId) {
+  try {
+    let response = await fetch('getHistory_proc.php', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ volunteerId: volunteerId })
+    });
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function ViewWorkDoneByVolunteer(volunteerId){
+  let modal = document.querySelector("#modalWorkDone")
+  modal.showModal()
+  let workTable = await fetchHistory(volunteerId)
+ 
+
+  modal.innerHTML = '<button id="btnWorkDoneClose" type="button" class="btn btn-dark">Close</button>'
+
+  modal.innerHTML += workTable
+  const buttons = document.querySelectorAll('.btn-view');
+
+// Function to call when button is clicked
+function callViewTranscribe() {
+    populateViewTranscription(this.id.substring(7));
+}
+
+// Add event listener to each button
+buttons.forEach(button => {
+    button.addEventListener('click', callViewTranscribe);
+});
+
+// Add event listener to btnClose
+let btnClose = document.querySelector("#btnWorkDoneClose");
+btnClose.addEventListener('click', () => {
+    // Remove event listener from each button
+    buttons.forEach(button => {
+        button.removeEventListener('click', callViewTranscribe);
+    });
+    modal.close();
+    modal.innerHTML = '';
+});
+
 }
   </script>
 
@@ -998,8 +1083,16 @@ function joinTranscText(imagesObj, mode) {
     <button class="aTabLinks" onclick="openAdminTab(event, 'tasks')">Tasks</button>
 
   </div>
+   <!-- View current Transcription Dialog-->
+   <dialog id="modalWorkDone" class="text-center">
+    
+
+    <div>
+   </dialog>
   <!-- View current Transcription Dialog-->
   <dialog id="modalViewTransc">
+    <h1 id="lblDocName" class="text-center"></h1>
+    <hr/>
     <div class="d-flex justify-content-around align-items-center mx-2">
       <div id="openseadragon1" style="width: 800px; height: 600px;"></div>
       <div class="d-flex flex-column my-2 mx-2 h-100 w-100">
@@ -1012,7 +1105,7 @@ function joinTranscText(imagesObj, mode) {
   </dialog>
   <!-- Tasks-->
   <div id="tasks" class="aTabContent">
-      <button class="aTabLinks" onclick="generateDocTable(event, 'empTable')">Employees</button>
+      <!-- <button class="aTabLinks" onclick="generateDocTable(event, 'empTable')">Employees</button> -->
       <button class="aTabLinks" onclick="generateDocTable(event, 'volTable')">Volunteers</button>
 
       <dialog id="reassignModal" class="h-50">
@@ -1040,13 +1133,13 @@ function joinTranscText(imagesObj, mode) {
   </div>
 
   <!-- Tasks Table-->
-  <div id="empTable" class="tableContent aTabContent">
+  <!-- <div id="empTable" class="tableContent aTabContent">
       <h1>Employees</h1>
       <?php
-       echo Document::GetAllAvailableDocumentsEmployeesAsHtmlTable()
+       //echo Document::GetAllAvailableDocumentsEmployeesAsHtmlTable()
 
       ?>
-  </div>
+  </div> -->
   
   <div id="volTable" class="tableContent aTabContent">
       <h1>Volunteers</h1>

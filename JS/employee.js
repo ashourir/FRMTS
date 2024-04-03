@@ -178,7 +178,7 @@ function validateRemoveUserCheck(evt) {
     $('#modal_choose_doc').on('click', () => {
       let docId = $('#hidden_id').val();
       // $.redirect('transcription.php', {employeeDocId: docId});
-      
+  
 
       $.ajax({
         type: "POST",

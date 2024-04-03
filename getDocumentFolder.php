@@ -1,5 +1,6 @@
 <?php
 require('./CLASSES/Document.php');
+global $con;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Decode the JSON data directly

@@ -197,7 +197,7 @@ class Employee
   public static function AddEmployeeRoles(int $employeeId, array $roles): string
   {
     global $con;
-    $roleNum;
+    $roleNum = 0;
     $counter = 0;
     foreach ($roles as $role) {
       switch ($role) {

@@ -690,7 +690,7 @@ if (isset($_GET["msg"])) {
     <!--CHANGE DOCUMENT NAME-->
     <div id="renameDocTab" class="uTabContent"  style="display: none;">
         Need to change a document's name? <BR>
-        <form action='renameDoc_proc.php' method='POST'>
+        <form action='renameDoc_proc.php' name="renameDocForm" method='POST'>
           Please select the collection:
           <select id="renameDoc" name="renameDoc" required="required" onchange="CHNShowDocuments(this.value)">
             <!-- this is to put the "required"to work, and because without it, when the page first load, the first collection 
@@ -738,15 +738,23 @@ if (isset($_GET["msg"])) {
       xmlhttp.send();
     }
   }
+  document.addEventListener("DOMContentLoaded", function() {
+        // Ensure the DOM is fully loaded before trying to access elements
+        const newDocumentNameInput = document.getElementById("newDocumentName");
+        if (newDocumentNameInput) {
+            newDocumentNameInput.addEventListener("keyup", function() {
+                // Your keyup event handling code here
+                removePlaceholder(this);
+            });
 
-
-    document.getElementById("renameDocForm").addEventListener("submit", function() {
-        const checkedRadioButton = document.querySelector("input[name='docCheck']:checked");
-        if (checkedRadioButton) {
-            const docId = checkedRadioButton.value;
-            document.getElementById("docId").value = docId;
+            // Your other JavaScript code here
         }
     });
+
+    function removePlaceholder(element) {
+        element.setAttribute("placeholder", "");
+    }
+
       </script>
 
 

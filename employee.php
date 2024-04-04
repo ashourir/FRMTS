@@ -626,6 +626,9 @@ btnClose.addEventListener('click', () => {
         <button class="uTabLinks" onclick="openUploadTab(event, 'addCollection')">Create Collection</button>
         <button class="uTabLinks" onclick="openUploadTab(event, 'updateCollection')">Update Collection</button>
         <button class="uTabLinks" onclick="openUploadTab(event, 'removeDoc')">Remove Document</button>
+        <button class="uTabLinks" onclick="openUploadTab(event, 'removeScannedDoc')">Remove Scanned Document</button>
+        <button class="uTabLinks" onclick="openUploadTab(event, 'renameDocTab')">Change Document Name</button>
+
       </div>
 
 
@@ -1059,8 +1062,110 @@ btnClose.addEventListener('click', () => {
 
     </div>
 
-   
+    <!-------ROSA-------->
+    <!--REMOVE SCANNED DOCUMENT-->
+    <div id="removeScannedDoc" class="uTabContent" style="display: none;">
+        Need to remove a scanned document? <BR>
+        <form action='deleteScannedDoc_proc.php' method='POST'>
+          Please select the collection:
+          <select id="scannedRemove" name="scannedRemove" required="required" onchange="ShowDocumentss(this.value)">
+            <!-- this is to put the "required"to work, and because without it, when the page first load, the first collection 
+            was selected but checkbox images were displayed. This forces the user to select something and update the checkboxes -->
+            <option value="">Select Collection</option>
+            <?php print(Collection::GetCollectionsDropDown()); ?>
+          </select>
 
+          <table id="documentssByCollectionCHK" name='documentssByCollectionCHK'>
+
+          </table>
+          <input type="submit" name="removeScannedDoc" value="Remove Scanned Document(s)">
+        </form>
+      </div>
+
+      <script>
+        function ShowDocumentss(collId) {
+          if (collId.length == 0) {
+            document.getElementById("documentssByCollectionCHK").innerHTML = "";
+            return;
+          } else {
+            const xmlhttp = new XMLHttpRequest();
+            xmlhttp.onload = function() {
+              document.getElementById("documentssByCollectionCHK").innerHTML = this.responseText;
+            }
+            xmlhttp.open("GET", "removeDoc_AJAX.php?q=" + collId);
+            xmlhttp.send();
+          }
+        }
+      </script>
+
+
+    </div>
+
+    <!--CHANGE DOCUMENT NAME-->
+    <div id="renameDocTab" class="uTabContent"  style="display: none;">
+        Need to change a document's name? <BR>
+        <form action='renameDoc_proc.php' method='POST'>
+          Please select the collection:
+          <select id="renameDoc" name="renameDoc" required="required" onchange="CHNShowDocuments(this.value)">
+            <!-- this is to put the "required"to work, and because without it, when the page first load, the first collection 
+            was selected but checkbox images were displayed. This forces the user to select something and update the checkboxes -->
+            <option value="">Select Collection</option>
+            <?php print(Collection::GetCollectionsDropDown()); ?>
+          </select>
+
+          <table id="CHNdocumentsByCollectionCHK" name='CHNdocumentsByCollectionCHK'>
+
+          </table>
+          <!-- Text input field -->
+           <input type="text" id="newDocumentName" name="newDocumentName"  required="required" placeholder="New Document Name"><br><br>
+           <input type="hidden" id="docId" name="docId">
+
+
+          <input type="submit" name="btnrenameDoc" value="Change Document's Name">
+        </form>
+      </div>
+
+      <script>
+        
+        function CHNShowDocuments(collId) {
+    if (collId.length == 0) {
+      document.getElementById("CHNdocumentsByCollectionCHK").innerHTML = "";
+      return;
+    } else {
+      const xmlhttp = new XMLHttpRequest();
+      xmlhttp.onload = function() {
+        document.getElementById("CHNdocumentsByCollectionCHK").innerHTML = this.responseText;
+
+        // Attach event listeners to the dynamically generated radio buttons
+        const radioButtons = document.querySelectorAll("input[name='docCheck']");
+        radioButtons.forEach(function(radioButton) {
+          radioButton.addEventListener("change", function() {
+            const docId = this.value; // Get the value (docId) of the selected radio button
+            console.log("Selected docId:", docId);
+            document.getElementById("docId").value = docId;
+
+            // You can perform further actions with the selected docId, like passing it to another function
+          });
+        });
+      };
+      xmlhttp.open("GET", "renameDoc_AJAX.php?q=" + collId);
+      xmlhttp.send();
+    }
+  }
+
+
+    document.getElementById("renameDocForm").addEventListener("submit", function() {
+        const checkedRadioButton = document.querySelector("input[name='docCheck']:checked");
+        if (checkedRadioButton) {
+            const docId = checkedRadioButton.value;
+            document.getElementById("docId").value = docId;
+        }
+    });
+      </script>
+
+
+    </div>
+    <!-------ROSA-------->
     <!-- Approve Section -->
     <div id="Approve" class="tabcontent">
       <?php

@@ -1,4 +1,7 @@
+
+
 window.onload = function() {
+
 
   document.getElementById("txtPassword").addEventListener("keyup", removePlaceholder);
   document.getElementById("txtUsername").addEventListener("keyup", removePlaceholder);
@@ -28,6 +31,7 @@ window.onload = function() {
       $('#upload_doc_form').submit();
     }
   });
+  
 }//end onload
 
 
@@ -200,5 +204,3 @@ function validateRemoveUserCheck(evt) {
   function noEdit() {
     console.log("no edit");
   }
-
-

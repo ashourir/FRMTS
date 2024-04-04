@@ -194,6 +194,7 @@ if (isset ($_POST['viewTranscribedDocId'])) {
   <script src="./JS/jsPDF-1.3.2/plugins/split_text_to_size.js"></script>
   <script src="./JS/turn.js-master/turn.min.js"></script>
   <script>
+    
   function initializeTurnJsBook() {
     // Check the pdfarray
     if (!window.pdfArray || !window.pdfArray.images || window.pdfArray.images.length === 0) {

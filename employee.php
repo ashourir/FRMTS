@@ -1062,8 +1062,6 @@ btnClose.addEventListener('click', () => {
 
     </div>
 
-   
-
     <!-------ROSA-------->
     <!--REMOVE SCANNED DOCUMENT-->
     <div id="removeScannedDoc" class="uTabContent" style="display: none;">

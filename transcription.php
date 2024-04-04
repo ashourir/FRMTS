@@ -183,6 +183,7 @@ if (isset ($_POST['viewTranscribedDocId'])) {
     <?php include_once ('./modal_complete_approve.php'); ?>
 
 
+
   </main>
 
   <?php include ("./footer.php"); ?>

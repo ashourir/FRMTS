@@ -29,7 +29,13 @@ if (isset($_POST["updateDocumentName"])) {
     echo "error";
   }
 }
+<<<<<<< HEAD
 
+=======
+else {
+    echo "error: No data received";
+}
+>>>>>>> 9def84cdbe2fd597fa9a38a6938c0d6d7399965c
 /////-----------------Rosa
 
 

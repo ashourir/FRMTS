@@ -11,6 +11,9 @@
     width: 100%;
     font-size: small;
 }
+#btnChangeName {
+    width: 100%;
+}
 
 .container,
 .container-lg,
@@ -25,7 +28,7 @@
     margin-bottom: 5vh !important;
 }
 
-.btn-save {
+.btn-save  {
     width: inherit;
     color: black;
     --bs-btn-color: #fff;

@@ -1,4 +1,5 @@
 $(document).ready(() => {
+  
   createOSDCanva(folderName);
   downloadAsPdf();
   goToVolunteerDashboard();
@@ -9,6 +10,8 @@ $(document).ready(() => {
   showDropDocumentMessageModalCall();
   showRejectDocumentMessageModalCall();
   saveButton();
+  setupChangeDocumentName();
+  
 });
 let currentImage = "";
 let filePath = "";
@@ -105,6 +108,44 @@ function attachEventHandlers(viewer) {
   })
 
 }
+
+///--------------- Rosa---------------------
+function setupChangeDocumentName() {
+  if ($('#btnChangeName').length) {
+    $("#btnChangeName").on('click', function() {
+
+      const newDocumentName = $('#newDocumentName').val().trim();
+      if (newDocumentName !== '') {
+        updateDocumentName(newDocumentName);
+        
+       
+      } else {
+        alert('Please enter a valid document name.');
+      }
+    })
+
+  }
+}
+
+
+function updateDocumentName(newName) {
+  $.ajax({
+      type: "POST",
+      url: "transcription_proc.php",
+      data: {
+          updateDocumentName: newName,
+      },
+      success: function (response) {
+          if (response === "success") {
+              alert('Document name updated successfully.');
+              // You can perform additional actions here, like updating UI elements.
+          } else {
+              alert('Failed to update document name. Please try again.');
+          }
+      }
+  });
+}
+////////////////Rosa----------------
 
 /**
  * 
@@ -305,8 +346,6 @@ function showCompleteMessageModalCall() {
   $('#btnCompleteCancel').click(function () {
     $('.confirmComplete').modal('hide');
   });
-
-
 }
 
 function clearTxtFileContents() {
@@ -556,3 +595,8 @@ function generatePDF(arrayOfImages) {
 
 
 }
+
+
+
+
+

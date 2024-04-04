@@ -10,3 +10,4 @@ cron_project_reminders.php
 cron_return_projects.php
 
 
+/PHPMailer/nbproject/private/

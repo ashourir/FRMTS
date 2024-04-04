@@ -107,6 +107,15 @@ if (isset($_POST['viewTranscribedDocId'])) {
           <div class="row">
             <?php echo $strDaysRemaining; ?>
           </div>
+<!--------Rosa------>
+          <div class="row">
+          <?php
+            
+              Document::SaveChangeNameButton($document->docId) 
+          ?>
+          
+          </div> 
+<!--------Rosa------>
           <div class="row">
             <div class="mb-3">
               <label for="txtTranscription" class="form-label">Transcription</label>
@@ -152,6 +161,7 @@ if (isset($_POST['viewTranscribedDocId'])) {
 
     <!-- Confirm modal will appear when the proofread volunteer clicks on the complete button -->
     <?php include_once('./modal_complete_approve.php'); ?>
+
 
   </main>
 

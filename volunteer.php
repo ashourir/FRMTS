@@ -122,6 +122,7 @@ $collectionList = Collection::GetCollectionsDropDown();
         }
 
 
+
         echo <<<_DOC
           <div class="cw_thumbnail_img">
             $img

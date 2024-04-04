@@ -16,7 +16,21 @@ if (isset($_POST["updateDocument"])) {
     echo "error";
   }
 }
+///////Rosa--------------- 
+if (isset($_POST["updateDocumentName"])) {
+  $newDocName = $_POST["updateDocumentName"];
+  $volunteer = $_SESSION['volunteer'];
+  $docId = $volunteer->activeDocId;
+  $result = Document::UpdateDocName($docId, $newDocName);
+  if ($result) {
+    
+    echo "success";
+  } else {
+    echo "error";
+  }
+}
 
+/////-----------------Rosa
 
 
 //this code will receite the text content from transcription and notes text area 

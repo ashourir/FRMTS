@@ -17,6 +17,9 @@ class Document
   private $description;
   private $textFilePath;
 
+
+
+
   //methods go here:
   //NATHALIE - Insert document record to database
   public static function InsertDocument(Document $doc)
@@ -93,11 +96,16 @@ class Document
     while ($row = mysqli_fetch_assoc($result)) {
       $docId = $row["documentId"];
       $docName = $row["name"];
+      $docfolder= $row["folderName"];
       if ($row != null) {
-        echo '<tr><td><input type="checkbox" id="docCheck[]" name="docCheck[]" value="' . $docId . '">' . $docName . '</td></tr>';
+        echo '<tr><td>';
+        echo '<input type="checkbox" id="docCheck[]" name="docCheck[]" value="' . $docId . '">' . $docName;
+
+        echo '</td></tr>';
       }
     } //end while
   }
+
 
   //NATHALIE - This makes documents unavailable - the closest thing we are willing to do to 'delete' the document record
   public static function MakeUnavailableById($docId)
@@ -111,6 +119,9 @@ class Document
     $stmt->execute();
     return $stmt->affected_rows == 1;
   }
+
+
+     
 
   //int $docId, string $name, string $status, string $filepath, int $typeId, int $numpages
 
@@ -793,4 +804,47 @@ public static function ReassignDocument($prevId, $actualEmpId, $documentId, $mod
   public function __construct()
   {
   }
+
+  
+  //---Rosa---
+ 
+  public static function UpdateDocName($docId, $newDocName)
+  {
+    global $con;
+    $stmt = $con->prepare("CALL UpdateDocName(?,?)");
+    $stmt->bind_param(
+      'ss',
+      $docId,
+      $newDocName
+    );
+    $stmt->execute();
+    if ($stmt->errno) {
+            echo "error: Execution failed: " . $stmt->error;
+            return false;
+        }
+    return $stmt->affected_rows == 1;
+  }
+
+  
+
+  public static function SaveChangeNameButton($docId){
+    $document = Document::getDocumentById($docId);
+    $statId = $document->statusId ;
+
+    if ($statId== 5) {
+    echo '
+      <div>
+      <label for="newDocumentName">Change Document Name:</label>
+      <textarea class="form-control" id="newDocumentName" name="newDocumentName" rows="2"></textarea><br>
+      </div>
+      <div class="btn-toolbar">
+      <span class="form-label form-control-sm" id="spanSaveName"></span>
+      <button type="button" class="btn btn-save mb-2" id="btnChangeName">Save new Name</button>
+      </div>
+    ';
+    }
+}
+ //------------Rosa
+
+
 }

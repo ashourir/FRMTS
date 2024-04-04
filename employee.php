@@ -106,6 +106,12 @@ if (isset($_GET["msg"])) {
   <script src="./JS/openseadragon/openseadragon.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
   <script>
+    window.addEventListener('load', ()=>{
+    let userList = document.querySelector("#userList")
+    PopulateVolunteerList()
+    let slcMode = document.querySelector('#slcVolunteerMode')
+    slcMode.addEventListener('change', PopulateVolunteerList)
+  })
     //Tabs stuff
     function openTab(evt, tabName) {
       // Declare all variables
@@ -596,7 +602,49 @@ btnClose.addEventListener('click', () => {
 });
 
 }
+
+
+//Alex
+//Scripts for populating volunteer list
+async function PopulateVolunteerList(){
+  let html = "<table class='table table-striped'><thead class='table-dark'><th>Volunteer Id</th><th>Email</th><th>isActive</th><th>Action</th></thead><tbody>";
+let slcMode = document.querySelector('#slcVolunteerMode');
+let mode = slcMode.value;
+
+try {
+  let tblUsers = document.querySelector("#tblVolunteers");
+  let response = await fetch('getVolunteers_proc.php', {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({mode})
+  });
+
+  if (response.ok) {
+    let data = await response.json();
+
+    data.forEach((row) => {
+      html += "<tr>";
+      html += `<td>${row.volunteerId}</td>`;
+      html += `<td>${row.email}</td>`;
+      html += `<td>${row.isActive}</td>`;
+      html += `<td><button class='btn btn-dark btn-sm' onclick='ViewWorkDoneByVolunteer(${row.volunteerId})'>View Work Done</button></td>`;
+      html += "</tr>";
+});
+
+    html += "</tbody></table>";
+    tblUsers.innerHTML = html;
+  }
+    }
+  
+
+  catch(err){
+    console.log(err)
+  }
+
+
+}
   </script>
+
 
 </head>
 
@@ -1081,7 +1129,8 @@ btnClose.addEventListener('click', () => {
     <button class="aTabLinks" onclick="openAdminTab(event, 'removeUser')">Remove User</button>
     <button class="aTabLinks" onclick="openAdminTab(event, 'removeStaff')">Remove Staff</button>
     <button class="aTabLinks" onclick="openAdminTab(event, 'tasks')">Tasks</button>
-
+    <button class="aTabLinks" onclick="openAdminTab(event, 'userList')">Volunteer List</button>
+    
   </div>
    <!-- View current Transcription Dialog-->
    <dialog id="modalWorkDone" class="text-center">
@@ -1101,8 +1150,17 @@ btnClose.addEventListener('click', () => {
         <button id="btnDocClose" class="btn btn-dark">Close</button>
       </div>
     </div>
-      
   </dialog>
+  <div id="userList" class="aTabContent">
+    <select id="slcVolunteerMode">
+      <option value="active">Active Volunteers</options>
+      <option value="inactive">Inactive Volunteers</options>
+    </select>
+    <div id="tblVolunteers" >
+       
+
+    </div>
+    </div>
   <!-- Tasks-->
   <div id="tasks" class="aTabContent">
       <!-- <button class="aTabLinks" onclick="generateDocTable(event, 'empTable')">Employees</button> -->
@@ -1131,7 +1189,7 @@ btnClose.addEventListener('click', () => {
       </div>
       </dialog>
   </div>
-
+      
   <!-- Tasks Table-->
   <!-- <div id="empTable" class="tableContent aTabContent">
       <h1>Employees</h1>

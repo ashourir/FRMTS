@@ -158,6 +158,36 @@ class Volunteer
     return $emailArray;
   }
 
+  //Alex
+  public static function GetVolunteers(string $mode): array
+{
+    global $con;
+    $volunteersArray = array();
+    
+    if($mode == "active") {
+        $stmt = $con->prepare("CALL GetAllVolunteersActive()");
+    } else {
+        $stmt = $con->prepare("CALL GetAllVolunteersInactive()");
+    }
+    
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $volunteer = array(
+                'volunteerId' => $row['volunteerId'],
+                'email' => $row['email'],
+                'isActive' => $row['isActive']
+            );
+            $volunteersArray[] = $volunteer;
+        }
+    }
+    
+    return $volunteersArray;
+}
+
+
   //Jeffery
   //Change a user to inactive, functionally a soft-delete from the database.
   public static function SetVolunteerInactive(int $id): bool
@@ -359,7 +389,7 @@ public static function GetUnassignedVolunteerEmails(){
   public static function GetHistoryByAdmin(int $volunteerId)
   {
     global $con;
-    $stmt = $con->prepare('CALL GetVolunteerHistory(?)');
+    $stmt = $con->prepare('CALL GetVolunteerHistoryDESC(?)');
     $stmt->bind_param('i', $volunteerId);
     $stmt->execute();
     $response = "<div class='volunteer_history'>";

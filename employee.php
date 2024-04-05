@@ -493,6 +493,13 @@ if (isset($_GET["msg"])) {
       let notes = joinTranscText(arrayOfImages, 'notes')
       txtNotes.innerHTML = notes
 
+      viewer.addHandler("page", (event)=>{
+        let transcription = joinTranscText(arrayOfImages, 'transc', event.page)
+        let notes = joinTranscText(arrayOfImages, 'notes', event.page)
+        txtDesc.innerHTML = transcription
+        txtNotes.innerHTML = notes
+      })
+
      
     }
   })
@@ -539,15 +546,16 @@ function createOSDViewer(images) {
 }
 
 
-function joinTranscText(imagesObj, mode) {
+function joinTranscText(imagesObj, mode, page = 0) {
  let obj = JSON.parse(imagesObj) //it takes the string formart and converts it to JS obj
     if(mode === 'transc'){
       obj.transcText[0] = obj.transcText[0].replace(/^\n/, '');
-    return obj.transcText.reduce((acc, text) => acc + text, '');
+    return obj.transcText[page];
     }
     else if (mode === 'notes'){
       obj.notesText[0] = obj.notesText[0].replace(/^\n/, '');
-    return obj.notesText.reduce((acc, text) => acc + text)}
+    return obj.notesText[page]
+    }
     
 }
 
@@ -1252,16 +1260,28 @@ try {
     <div>
    </dialog>
   <!-- View current Transcription Dialog-->
-  <dialog id="modalViewTransc">
-    <h1 id="lblDocName" class="text-center"></h1>
+  <dialog style="height: 100%;" id="modalViewTransc">
+
+       <h1 id="lblDocName" class="text-center"></h1>
+    
     <hr/>
     <div class="d-flex justify-content-around align-items-center mx-2">
       <div id="openseadragon1" style="width: 800px; height: 600px;"></div>
-      <div class="d-flex flex-column my-2 mx-2 h-100 w-100">
-        <textarea readonly rows="15" class="my-2" id='txtDesc'></textarea>
-        <textarea readonly rows="5" class="my-2" id='txtNotes'></textarea>
-        <button id="btnDocClose" class="btn btn-dark">Close</button>
-      </div>
+      <div class="d-flex flex-column justify-content-start h-100 w-100">
+        
+        <div class="d-flex flex-column my-2 mx-2 h-100 w-100">
+          <textarea readonly rows="12" class="my-2" id='txtDesc'></textarea>
+          <textarea readonly rows="5" class="my-2" id='txtNotes'></textarea>
+          <div class="btn-group my-1" role="group" aria-label="Basic example">
+              <button title="Previous page" type="button" class="btn btn-primary" id="btnPrev"> <i
+                  class="material-icons">chevron_left</i> </button>
+              </button>
+              <button title="Next Page" type="button" class="btn btn-primary" id="btnNext"> <i
+                  class="material-icons">chevron_right</i> </button>
+        </div>
+          <button id="btnDocClose" class="btn btn-dark">Close</button>
+        </div>
+    </div>
     </div>
   </dialog>
   <div id="userList" class="aTabContent">

@@ -1,7 +1,7 @@
 <?php
 include_once("connect.php");
 include_once("CLASSES/Volunteer.php");
-$delUserEmail = $_REQUEST["userList"];
+$delUserEmail = $_REQUEST["volList"];
 $reply;
 $delUserId = Volunteer::GetUserIdByEmail($delUserEmail);
 if ($delUserId != 0){

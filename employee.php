@@ -1407,7 +1407,7 @@ try {
           <tr>
                 <td>Select User:</td>
                 <td>
-                <select list="dtlUser" id="userList" name="userList">
+                <select list="dtlUser" id="userList" name="volList">
                     <option value="Select a User">Select a User</option>
                     <?php
                       echo Volunteer::GetAllVolunteersFormatted();

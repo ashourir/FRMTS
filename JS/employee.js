@@ -133,7 +133,8 @@ function validateAddUserCheck(evt) {
     };
 
 function validateRemoveUserCheck(evt) {
-    let email = document.getElementById("userList");
+    let email = document.getElementById("volList");
+    console.log(email)
     let error = document.getElementById("spnDelUserError");
     let entries = email.children;
     if (email.value === "Select a User") {

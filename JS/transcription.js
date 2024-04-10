@@ -13,55 +13,52 @@ $(document).ready(() => {
   setupChangeDocumentName();
   
 });
-let currentImage = "";
+
+let currentImage = "";  
 let filePath = "";
 let logoPath = "./IMAGES/logo.jpg";
 let pdfArray = [];
 let intervalIdMessage;
 
-
 //------------------------------------------ createOSDCanva SECTION -----------------------------------------------
 /**
- * @summary This function is responsible for creating the Open Sea Dragon canva viewer.
- * It uses the folder name path comming from the PHP Document Object on transcription.php
+ * @summary This function is responsible for creating the Open Sea Dragon canvas viewer.
+ * It uses the folder name path coming from the PHP Document Object on transcription.php
  * @argument {*} folderName
  */
 function createOSDCanva(folderName) {
   $.ajax({
     type: "POST",
     url: "transcription_proc.php",
-    //I can send login information to decide what function to execute in the proc.php
     data: {
-      //folderName is coming from transcription.php after the footer php include
-      //This folder name is coming from the php Document object
       createOSDCanva: folderName,
     },
-    // dataType: "dataType",
     success: (arrayOfImages) => {
       pdfArray = JSON.parse(arrayOfImages);
       let formatedImagesArray = createImageArray(arrayOfImages);
       var viewer = createOSDViewer(formatedImagesArray);
       attachEventHandlers(viewer);
+      console.log("AJAX success, pdfArray populated:", pdfArray);
+
+      // Update window.pdfArray for global access
+      window.pdfArray = pdfArray;
     }
-  })
+  });
 }
 
 /**
- * @summary Receives an JSON obj comming as response from ajax call, parses it and creates an array of images
+ * @summary Receives a JSON obj coming as response from ajax call, parses it and creates an array of images
  * @param {Array} arrayOfImages 
- * @returns a formated Array of images to feed the openSeaDragon obj
+ * @returns a formatted Array of images to feed the OpenSeaDragon obj
  */
-
 function createImageArray(arrayOfImages) {
   let formatedImagesArray = [];
   let resParsed = JSON.parse(arrayOfImages);
   resParsed.images.forEach(path => {
-    formatedImagesArray.push(
-      {
-        type: "image",
-        url: path
-      }
-    )
+    formatedImagesArray.push({
+      type: "image",
+      url: path
+    });
   });
   return formatedImagesArray;
 }
@@ -71,7 +68,7 @@ function createImageArray(arrayOfImages) {
  * @param {Array} images 
  */
 function createOSDViewer(images) {
-  //create the openseadragon viewer
+  //create the OpenSeaDragon viewer
   var viewer = OpenSeadragon({
     id: 'openseadragon1',
     prefixUrl: './JS/openseadragon/images/',
@@ -91,7 +88,27 @@ function createOSDViewer(images) {
   return viewer;
 }
 
-/**
+// Code for the Book Viewer Popup
+document.addEventListener('DOMContentLoaded', function () {
+  const bookViewButton = document.getElementById('btnBookView');
+  const bookViewDialog = document.getElementById('bookViewDialog');
+  const closeDialogButton = document.getElementById('closeDialog');
+
+  bookViewButton.addEventListener('click', function () {
+    bookViewDialog.showModal();
+    if (window.initializeTurnJsBook) window.initializeTurnJsBook();
+    else console.error("Turn.js initialization function not found.");
+  });
+
+  closeDialogButton.addEventListener('click', function () {
+    window.location.reload(true);
+    bookViewDialog.close();
+  });
+
+});
+
+
+/*
  * @summary This function is used to attach event handlers to the OSD viewer. That way, no no function is loaded if there's no image in the viewer
  * @param {*} viewer 
  */

@@ -29,9 +29,6 @@ if (isset($_POST["updateDocumentName"])) {
     echo "error";
   }
 }
-else {
-    echo "error: No data received";
-}
 /////-----------------Rosa
 
 
@@ -177,3 +174,4 @@ function saveFileContents($text, $fileName, $option)
   fwrite($file, $text);
   fclose($file);
 }
+

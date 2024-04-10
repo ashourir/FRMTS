@@ -103,6 +103,8 @@ if (isset($_GET["msg"])) {
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
   <?php include("e_head.php"); ?>
   <link rel="stylesheet" href="./CSS/employee.css">
+  <script src="./JS/openseadragon/openseadragon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
   <script>
     //Tabs stuff
     function openTab(evt, tabName) {
@@ -169,6 +171,23 @@ if (isset($_GET["msg"])) {
       evt.currentTarget.className += " active";
     }
 
+    //generate tables with documents and employees
+    function generateDocTable(evt, tabName){
+      let aTabContent = document.getElementsByClassName("tableContent");
+      for (i = 0; i < aTabContent.length; i++) {
+        aTabContent[i].style.display = "none";
+      }
+
+      aTabLinks = document.getElementsByClassName("aTabLinks");
+      for (i = 0; i < aTabLinks.length; i++) {
+        aTabLinks[i].className = aTabLinks[i].className.replace(" active", "");
+      }
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+
+    
+
     function getDocumentData(fileId) {
       let targetData = "document" + fileId;
       let input = document.getElementById(targetData);
@@ -184,6 +203,399 @@ if (isset($_GET["msg"])) {
         document.getElementById("modal_choose_doc").setAttribute("value", "Resume Approval");
       }
     }
+    //alex
+    //Function to make an Ajax request to a proc page and return a document obj
+    async function GetDocumentById(documentId){
+        try{
+           let response = await fetch("getDocumentById.php", {
+              method: 'POST',
+              body: JSON.stringify({documentId: documentId})
+           })
+           if(response.ok){
+            let data = await response.json()
+            return data
+           }
+        }
+        catch(err){
+          console.log(err)
+        }
+    }
+    //Reasign function
+    async function GenerateReassignModal(mode, id, documentId, statusId){
+      let selectedId, targetRole
+      let modal = document.querySelector("#reassignModal")
+      modal.showModal()
+      let inpDocName = document.querySelector("#inpDocName")
+      let documentById = await GetDocumentById(documentId)
+      inpDocName.value = documentById
+      let btnConfirm = document.querySelector("#btnConfirm")
+      let empContent = "<?php echo Employee::GetUnassignedEmployeesFormatted() ?>"
+      let selcEmployee = document.querySelector("#empSelect")
+      selcEmployee.innerHTML += empContent
+      let volContent = "<?php echo Volunteer::GetUnassignedVolunteersFormatted() ?>"
+      let selcVolunteer = document.querySelector("#volSelect")
+      selcVolunteer.innerHTML += volContent
+      let btnReturn = document.querySelector('#btnReturn')
+
+      let btnCancel = document.querySelector("#btnCancel")
+      btnCancel.addEventListener('click', function cancelModal(){
+        modal.close()
+        btnConfirm.removeEventListener('click', confirmClick)
+        btnReturn.removeEventListener('click', evtReturnDocument)
+        selcEmployee.innerHTML = "<option value=''>Employee List</option>"
+        selcVolunteer.innerHTML = "<option value=''>Volunteer List</option>"
+      })
+
+      //events listeners to the select elements
+      selcEmployee.addEventListener("change", () => {
+    if (selcEmployee.value) {
+        selcVolunteer.value = "";
+        targetRole = "emp"
+       }
+    });
+
+    selcVolunteer.addEventListener("change", () => {
+        if (selcVolunteer.value) {
+        selcEmployee.value = "";
+        targetRole = "volunteer"
+       }
+    });
+    //event listener to the Return document button
+    
+    if(btnReturn){
+      btnReturn.addEventListener('click', evtReturnDocument)
+    }
+    function evtReturnDocument(){
+      ReturnDocument(documentId)
+      btnCancel.click()
+    }
+
+    modal.addEventListener('cancel', (event)=> {
+            event.preventDefault()
+          })
+
+      let confirmClick = () =>{
+        if(selcEmployee.value || selcVolunteer.value){
+        selectedId = selcEmployee.value || selcVolunteer.value;
+      }
+      if (selcEmployee.value || selcVolunteer.value) {
+        selectedId = selcEmployee.value || selcVolunteer.value;
+        ReassignEmployee(id, selectedId, documentId, mode, targetRole, statusId);
+      } else {
+        alert("Please select an employee or volunteer.");
+      }
+        }
+        btnConfirm.addEventListener('click', confirmClick)
+
+}
+    
+      
+    async function ReassignEmployee(prevId, currentId, documentId ,mode, targetRole, statusId){
+        let data = {
+          prevId,
+          currentId,
+          documentId,
+          mode,
+          targetRole,
+          statusId
+        }
+        try{
+          let response = await fetch('reassignDocument_proc.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        if(response.ok){
+          let modalSuccess = document.querySelector("#modalSuccess")
+          modalSuccess.showModal()
+          document.querySelector("#btnSucOk").addEventListener("click", ()=>{
+             modalSuccess.close()
+             window.location.reload()
+          })
+        }
+        else {
+          alert("something went wrong")
+        }
+
+        }
+        catch(err){
+          console.log(err)
+        }
+        
+    }
+
+    //Alex
+    //Ajax call to get the remaining time for each document in the admin table
+    async function GetTimeRemaining(id, documentId){
+      try{
+        let response = await fetch('timeRemaining_proc.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ volunteerId: id })
+    });
+    if(!response.ok){
+      document.querySelector("#timeRemain"+id).innerHTML = '-'
+    }
+    else {
+      data = await response.json()
+      document.querySelector("#timeRemain"+id).innerHTML = data.timeRemaining + " Days"
+      let circleStatus = document.querySelector("#circleStatus"+id)
+      if (data.timeRemaining <= 15) {
+        if(data.timeRemaining <= 0){
+            await ReturnDocument(documentId)
+
+        }
+        else if(data.timeRemaining <= 5){
+          circleStatus.innerHTML += `<img src='./IMAGES/ICONS/red-circle.png'></img>`;
+
+        }
+        else {
+          circleStatus.innerHTML += `<img src='./IMAGES/ICONS/yellow-circle.png'></img>`;
+        }
+      }
+      
+      
+    } 
+
+    }
+    catch(err){
+        console.log(err)
+        window.location.reload(true)
+      }
+    }
+
+    //Alex
+    //Ajax function to return the document when it's overdue
+    async function ReturnDocument(documentId){
+      try{
+          let response = await fetch('returnDocument_proc.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ documentId: documentId})
+          })
+          if(response.ok){
+            let data = await response.json();
+            if(data.success){
+              let row = document.querySelector(`#tableRow${documentId}`)
+              row.remove()
+              alert(`Document: ${documentId} has been returned to the pool`)
+            }
+          }
+          else {
+            alert("Returning Document attempt failed.")
+          }
+      }
+      catch(err){
+        console.log(err)
+        alert("Returning Document attempt failed.")
+      }
+    }
+    
+
+
+    //Alex
+    //Events listeners to see documents when admin clicks its name
+    function docNamesEventListeners(docId){
+      let td = document.querySelector("#tdDocId"+docId)
+      td.addEventListener('click', ()=>{
+        populateViewTranscription(docId)
+      })
+
+    }
+
+    async function getFolderName(docId){
+      try{
+        let response = await fetch('getDocumentFolder.php', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+            },
+          body: JSON.stringify({documentId: docId})
+        })
+        
+     
+       if(response.ok){
+          let folderName = await response.json()
+         
+          return folderName
+        }
+      }
+      catch(err){
+        console.log(err)
+      }
+    }
+
+    async function getDocName(docId){
+      try{
+        let response = await fetch('getDocumentById.php', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+            },
+          body: JSON.stringify({documentId: docId})
+        })
+        
+     
+       if(response.ok){
+          let docName = await response.json()
+         
+          return docName
+        }
+      }
+      catch(err){
+        console.log(err)
+      }
+    }
+    
+       async function populateViewTranscription(docId){
+          let modal = document.querySelector("#modalViewTransc")
+         
+          let txtDesc = document.querySelector("#txtDesc")
+          let txtNotes = document.querySelector("#txtNotes")
+          let folderName = await getFolderName(docId)
+          let docName = await getDocName(docId)
+          modal.showModal()
+          modal.addEventListener('cancel', (event)=> {
+            event.preventDefault()
+          })
+          document.querySelector('#lblDocName').innerText = docName
+          //add event listener to close the modal
+          let btnClose = document.querySelector('#btnDocClose')
+          btnClose.addEventListener('click', ()=>{
+            document.querySelector('#openseadragon1').innerHTML = ''
+            modal.close()
+          })
+          $.ajax({
+    type: "POST",
+    url: "transcription_proc.php",
+    data: {
+     
+      createOSDCanva: folderName
+    },
+    // dataType: "dataType",
+    success: (arrayOfImages) => {
+      let formatedImagesArray = createImageArray(arrayOfImages);
+      var viewer = createOSDViewer(formatedImagesArray);
+      let transcription = joinTranscText(arrayOfImages, 'transc')
+      txtDesc.innerHTML = transcription
+      let notes = joinTranscText(arrayOfImages, 'notes')
+      txtNotes.innerHTML = notes
+
+     
+    }
+  })
+
+      }
+    
+    
+      //function to create formatted array of images
+      function createImageArray(arrayOfImages) {
+       
+  let formatedImagesArray = [];
+  let resParsed = JSON.parse(arrayOfImages);
+  resParsed.images.forEach(path => {
+    formatedImagesArray.push(
+      {
+        type: "image",
+        url: path
+      }
+    )
+  });
+  return formatedImagesArray;
+}
+
+//function to create viewer
+function createOSDViewer(images) {
+  //create the openseadragon viewer
+  var viewer = OpenSeadragon({
+    id: 'openseadragon1',
+    prefixUrl: './JS/openseadragon/images/',
+    showNavigator: true,
+    navigatorPosition: 'TOP_RIGHT',
+    showSequenceControl: true,
+    nextButton: 'btnNext',
+    previousButton: 'btnPrev',
+    tileSources: images,
+    sequenceMode: true,
+    showReferenceStrip: true,
+    maxZoomPixelRatio: 5,
+    minZoomLevel: 0,
+    defaultZoomLevel: 0,
+    // debugMode: true
+  });
+  return viewer;
+}
+
+
+function joinTranscText(imagesObj, mode) {
+ let obj = JSON.parse(imagesObj) //it takes the string formart and converts it to JS obj
+    if(mode === 'transc'){
+      obj.transcText[0] = obj.transcText[0].replace(/^\n/, '');
+    return obj.transcText.reduce((acc, text) => acc + text, '');
+    }
+    else if (mode === 'notes'){
+      obj.notesText[0] = obj.notesText[0].replace(/^\n/, '');
+    return obj.notesText.reduce((acc, text) => acc + text)}
+    
+}
+
+
+//Alex Function to visualize work done by volunteer
+
+async function fetchHistory(volunteerId) {
+  try {
+    let response = await fetch('getHistory_proc.php', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ volunteerId: volunteerId })
+    });
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function ViewWorkDoneByVolunteer(volunteerId){
+  let modal = document.querySelector("#modalWorkDone")
+  modal.showModal()
+  let workTable = await fetchHistory(volunteerId)
+ 
+
+  modal.innerHTML = '<button id="btnWorkDoneClose" type="button" class="btn btn-dark">Close</button>'
+
+  modal.innerHTML += workTable
+  const buttons = document.querySelectorAll('.btn-view');
+
+// Function to call when button is clicked
+function callViewTranscribe() {
+    populateViewTranscription(this.id.substring(7));
+}
+
+// Add event listener to each button
+buttons.forEach(button => {
+    button.addEventListener('click', callViewTranscribe);
+});
+
+// Add event listener to btnClose
+let btnClose = document.querySelector("#btnWorkDoneClose");
+btnClose.addEventListener('click', () => {
+    // Remove event listener from each button
+    buttons.forEach(button => {
+        button.removeEventListener('click', callViewTranscribe);
+    });
+    modal.close();
+    modal.innerHTML = '';
+});
+
+}
   </script>
 
 </head>
@@ -200,6 +612,8 @@ if (isset($_GET["msg"])) {
       <button id="btnRole1" class="tablinks" onclick="openTab(event, 'Upload')">Upload</button>
       <button id="btnRole2" class="tablinks" onclick="openTab(event, 'Approve')">Approve</button>
       <button id="btnRole3" class="tablinks" onclick="openTab(event, 'Admin')">Admin</button>
+    
+
     </div>
 
     <!-- Tab content -->
@@ -737,18 +1151,99 @@ if (isset($_GET["msg"])) {
       ?>
     </div>
 
-    <!-- Admin Section -->
-    <div id="Admin" class="tabcontent">
-      <div class="tab">
-        <button class="aTabLinks" onclick="openAdminTab(event, 'newStaff')">Add New Staff</button>
-        <button class="aTabLinks" onclick="openAdminTab(event, 'removeUser')">Remove User</button>
-        <button class="aTabLinks" onclick="openAdminTab(event, 'removeStaff')">Remove Staff</button>
-      </div>
+   <!-- Admin Section -->
+<div id="Admin" class="tabcontent">
+  <div class="tab">
+    <button class="aTabLinks" onclick="openAdminTab(event, 'newStaff')">Add New Staff</button>
+    <button class="aTabLinks" onclick="openAdminTab(event, 'removeUser')">Remove User</button>
+    <button class="aTabLinks" onclick="openAdminTab(event, 'removeStaff')">Remove Staff</button>
+    <button class="aTabLinks" onclick="openAdminTab(event, 'tasks')">Tasks</button>
 
-      <!-- NEW STAFF-->
-      <div id="newStaff" class="aTabContent">
-        <div>
-          <form method="post" action="add_staff_proc.php">
+  </div>
+   <!-- View current Transcription Dialog-->
+   <dialog id="modalWorkDone" class="text-center">
+    
+
+    <div>
+   </dialog>
+  <!-- View current Transcription Dialog-->
+  <dialog id="modalViewTransc">
+    <h1 id="lblDocName" class="text-center"></h1>
+    <hr/>
+    <div class="d-flex justify-content-around align-items-center mx-2">
+      <div id="openseadragon1" style="width: 800px; height: 600px;"></div>
+      <div class="d-flex flex-column my-2 mx-2 h-100 w-100">
+        <textarea readonly rows="15" class="my-2" id='txtDesc'></textarea>
+        <textarea readonly rows="5" class="my-2" id='txtNotes'></textarea>
+        <button id="btnDocClose" class="btn btn-dark">Close</button>
+      </div>
+    </div>
+      
+  </dialog>
+  <!-- Tasks-->
+  <div id="tasks" class="aTabContent">
+      <!-- <button class="aTabLinks" onclick="generateDocTable(event, 'empTable')">Employees</button> -->
+      <button class="aTabLinks" onclick="generateDocTable(event, 'volTable')">Volunteers</button>
+
+      <dialog id="reassignModal" class="h-50">
+      <div class="d-flex flex-column justify-content-around align-items-center p-2  h-100 w-100">
+          <h3>Please Select an Employee or a Volunteer to be assigned</h3>
+          <input class="w-100 p-1 text-center" id="inpDocName" type="text" readOnly disabled></input>
+          <div class="mx-2 w-75">
+            <select id="empSelect" class="w-100 p-2 my-1">
+              <option value="">Employeer List</option>
+            
+                
+            </select>
+
+            <select id="volSelect" class="w-100 p-2 my-1">
+                <option value="">Volunteer List</option>
+            </select>
+          </div>
+          <div class="mx-2">
+            <button id="btnConfirm" type='button' class='btn btn-dark'>Confirm</button>
+            <button id="btnCancel" type='button' class='btn btn-dark'>Cancel</button>
+            <button id="btnReturn" type='button' class='btn btn-danger'>Return Document</button>
+          </div>
+      </div>
+      </dialog>
+  </div>
+
+  <!-- Tasks Table-->
+  <!-- <div id="empTable" class="tableContent aTabContent">
+      <h1>Employees</h1>
+      <?php
+       //echo Document::GetAllAvailableDocumentsEmployeesAsHtmlTable()
+
+      ?>
+  </div> -->
+  
+  <div id="volTable" class="tableContent aTabContent">
+      <h1>Volunteers</h1>
+      <?php
+        echo Document::GetAllAvailableDocumentsVolunteersAsHtmlTable()
+      ?>
+  </div>
+
+  <!-- Success Modal-->
+  <dialog id="modalSuccess">
+      <div class="d-flex p-2 flex-column justify-content-around">
+            <p class="h3">Success<p>
+        
+            <hr>
+                <p class="mx-auto h2">The Document has been reassigned!</p>
+            <hr>
+            <button id="btnSucOk" type="button" class="btn btn-dark" >OK</button>
+      </div>
+  </dialog>
+
+  <script>
+    
+  </script>
+  <!-- NEW STAFF-->
+  <div id="newStaff" class="aTabContent">
+    <div>
+    <form method="post" action="add_staff_proc.php">
             <table>
               <tr>
                 <th colspan="2">Add new employee:</th>
@@ -778,30 +1273,30 @@ if (isset($_GET["msg"])) {
               </tr>
             </table>
           </form>
-        </div>
-        <span id="spnAddError">&nbsp;</span>
-        <?php
-        if (isset($_GET["addStaffMessage"])) {
-          echo "<p>" . $_GET["addStaffMessage"] . "</p>";
-        }
-        ?>
-      </div>
-
-      <!-- REMOVE USER -->
-      <div id="removeUser" class="aTabContent">
-        <div>
-          <form method="post" action="remove_user_proc.php">
-            <table>
-              <tr>
-                <th colspan="2">Remove User:</th>
-              </tr>
-              <tr>
+    </div>
+    <span id="spnAddError">&nbsp;</span>
+    <?php
+    if (isset($_GET["addStaffMessage"])) {
+      echo "<p>" . $_GET["addStaffMessage"] . "</p>";
+    }
+    ?>
+  </div>
+   
+  <!-- REMOVE USER -->
+  <div id="removeUser" class="aTabContent">
+    <div>
+      <form method="post" action="remove_user_proc.php">
+        <table>
+          <tr>
+            <th colspan="2">Remove User:</th>
+          </tr>
+          <tr>
                 <td>Select User:</td>
                 <td>
-                  <select list="dtlUser" id="userList" name="userList">
+                <select list="dtlUser" id="userList" name="userList">
                     <option value="Select a User">Select a User</option>
                     <?php
-                    echo Volunteer::GetAllVolunteersFormatted();
+                      echo Volunteer::GetAllVolunteersFormatted();
                     ?>
                   </select>
                 </td>
@@ -809,20 +1304,22 @@ if (isset($_GET["msg"])) {
               <tr>
                 <td colspan="2"><input type="submit" value="Delete User" id="btnRemoveUser" name="btnRemoveUser"></td>
               </tr>
-            </table>
-          </form>
-        </div>
-        <span id="spnDelUserError">&nbsp;</span>
-        <?php
-        if (isset($_GET["removeUserMessage"])) {
-          echo "<p>" . $_GET["removeUserMessage"] . "</p>";
-        }
-        ?>
-      </div>
+        </table>
+      </form>
+    </div>
+    <span id="spnDelUserError">&nbsp;</span>
+    <?php
+    if (isset($_GET["removeUserMessage"])) {
+      echo "<p>" . $_GET["removeUserMessage"] . "</p>";
+    }
+    ?>
+  </div>
 
-      <!-- REMOVE STAFF -->
-      <div id="removeStaff" class="aTabContent">
-        <div>
+  
+  
+  <!-- REMOVE STAFF -->
+  <div id="removeStaff" class="aTabContent">
+  <div>
           <form method="post" action="remove_staff_proc.php">
             <table>
               <tr>
@@ -834,7 +1331,7 @@ if (isset($_GET["msg"])) {
                   <select id="staffList" name="staffList">
                     <option value="Select a Staff Member">Select a Staff Member</option>
                     <?php
-                    echo Employee::GetAllEmployeesFormatted();
+                       echo Employee::GetAllEmployeesFormatted();
                     ?>
                   </select>
                 </td>
@@ -851,8 +1348,9 @@ if (isset($_GET["msg"])) {
           echo "<p>" . $_GET["removeStaffMessage"] . "</p>";
         }
         ?>
-      </div>
-    </div>
+  </div>
+</div>
+
 
 
   </main>

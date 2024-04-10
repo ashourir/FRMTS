@@ -197,7 +197,7 @@ class Employee
   public static function AddEmployeeRoles(int $employeeId, array $roles): string
   {
     global $con;
-    $roleNum;
+    $roleNum = 0;
     $counter = 0;
     foreach ($roles as $role) {
       switch ($role) {
@@ -282,6 +282,23 @@ class Employee
     }
     return $usernameArray;
   }
+  //Alex
+  public static function GetUnassignedEmployeeUsernames(): array
+  {
+    global $con;
+    $usernameArray = array();
+    $stmt = $con->prepare("CALL GetUnassignedEmployees()");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $rows = $result->fetch_all(MYSQLI_ASSOC);
+    if ($result->num_rows > 0) {
+      foreach ($rows as $row) {
+        $employee = ["employeeId" => $row["employeeId"], "username" => $row["username"]];
+        array_push($usernameArray, $employee);
+      }
+    }
+    return $usernameArray;
+  }
 
 
   //JEFFERY
@@ -295,6 +312,17 @@ class Employee
     }
     return $employeeUsernames;
   }
+
+  //Alex
+  public static function GetUnassignedEmployeesFormatted(){
+    $employees = Employee::GetUnassignedEmployeeUsernames();
+    $employeeOptions = "";
+    foreach ($employees as $employee) {
+        $employeeOptions .= "<option value='{$employee["employeeId"]}'>{$employee["username"]}</option>";
+    }
+    return $employeeOptions;
+}
+
 
   //Jeffery
   //Change a staff member to inactive, functionally a soft-delete from the database.
@@ -371,8 +399,6 @@ class Employee
     $stmt->close();
     return $historyApprovedId;
   }
-
-
 
   //getters, setters, constructor
   public function getActiveDocId()

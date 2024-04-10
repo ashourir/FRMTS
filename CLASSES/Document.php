@@ -306,7 +306,6 @@ class Document
     $stmt->bind_param('s', $docId);
     $stmt->execute();
     $result = $stmt->get_result();
-
     if ($result->num_rows == 0) {
       return "invalid document";
     } else {
@@ -320,6 +319,7 @@ class Document
       $document->numPages = $pages;
       $document->description = $desc;
       $document->textFilePath = $textFile;
+
       return $document;
     } //end else 
   } //end getDocument
@@ -712,6 +712,75 @@ class Document
     $stmt->close();
     return $status;
   }
+
+  /*public static function GetAllAvailableDocumentsEmployeesAsHtmlTable(){
+    global $con;
+    $stmt = $con->prepare('CALL GetAllAvailableDocumentsEmployees()');
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $html = '<table class="table">';
+    $html .= '<thead class="thead-dark"><tr><th>Document ID</th><th>Document</th><th>Employee</th><th>Status</th><th>Action</th></tr></thead>';
+    $html .= '<tbody>';
+    while ($row = $result->fetch_assoc()) {
+        $html .= '<tr>';
+        $html .= '<td>' . $row['documentId'] . '</td>';
+        $html .= '<td>' . $row['name'] . '</td>';
+        $html .= '<td>' . $row['username'] . '</td>';
+        $html .= '<td>' . $row['documentStatus'] . '</td>';
+        $html .= '<td><button type="button" onclick="GenerateReassignModal(\'emp\', \'' . $row['employeeId'] . '\', \'' . $row['documentId'] . '\')" class="btn btn-dark">Reassign task</button></td>';        $html .= '</tr>';
+    }
+    $html .= '</tbody>';
+    $html .= '</table>';
+
+    return $html;
+}
+*/
+
+public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
+  global $con;
+  $stmt = $con->prepare('CALL GetAllAvailableDocumentsVolunteers()');
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  $html = '<table class="table table-striped ">';
+  $html .= '<thead class="table-dark"><tr><th>Document ID</th><th>Document</th><th>Volunteer</th><th>Status</th><th>Remaining</th><th>Action</th></tr></thead>';
+  $html .= '<tbody>';
+  while ($row = $result->fetch_assoc()) {
+    $html .= '<tr id="tableRow'.$row['documentId'].'">';
+    $html .= '<td class="mx-auto my-auto"><span class="h-25 w-25" id="circleStatus'.$row['volunteerId'].'"></span> ' . $row['documentId'] .  '</td>';
+    $html .= '<td onclick="populateViewTranscription(\'' . $row['documentId'] . '\')" id="tdDocId' . $row['documentId'] . '" style="cursor: pointer;">' . $row['name'] . '</td>';
+    $html .= '<td>' . $row['email'] . '</td>';
+    $html .= '<td>' . $row['documentStatus'] . '</td>';
+    $html .= '<td id="timeRemain'.$row['volunteerId'].'"></td>';
+    $html .= '<td class="dropdown">';
+    $html .= '<button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton'.$row['documentId'].'" data-bs-toggle="dropdown" aria-expanded="false">Actions</button>';
+    $html .= '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton'.$row['documentId'].'">';
+    $html .= '<li><a class="dropdown-item" href="#" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\', \'' . $row['statusId'] . '\')">Reassign task</a></li>';
+    $html .= '<li><a class="dropdown-item" href="#" onclick="ViewWorkDoneByVolunteer(\'' . $row['volunteerId'] . '\')">View work done by user</a></li>';
+    $html .= '</ul>';
+    $html .= '</td>';
+
+    echo '<script>GetTimeRemaining("' . $row['volunteerId'] . '","' . $row['documentId'] . '")</script>';
+    $html .= '</tr>';
+}
+$html .= '</tbody>';
+$html .= '</table>';
+
+
+  return $html;
+}
+
+//Alex
+public static function ReassignDocument($prevId, $actualEmpId, $documentId, $mode, $targetRole, $statusId){
+  global $con;
+
+  $stmt = $con->prepare("CALL ReassignActiveDocId(?, ?, ?, ?, ?, ?, @result)");
+  $stmt->bind_param("iiissi", $prevId, $actualEmpId, $documentId, $mode, $targetRole, $statusId);
+  $stmt->execute();
+  $stmt->close();
+  return $documentId;
+}
 
 
 

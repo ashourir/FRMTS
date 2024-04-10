@@ -31,6 +31,7 @@ $(document).ready(function() {
     if (validEmail && validDOB) {
       checkEmailExists(email.val(), function(result) {
         if (result) {
+          console.log(result)
           createVolunteer(email.val(), dob.val(), function(result) {
             if (result) {
               //display confirm message reminding them to check their inbox

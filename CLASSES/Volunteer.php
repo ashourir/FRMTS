@@ -272,18 +272,35 @@ class Volunteer
   public static function GetAllActiveVolunteerEmails(){
     global $con;
     $emailArray = array();
-    $stmt = $con->prepare("CALL GetAllActiveVolunteerEmails()");
+    $stmt = $con->prepare("CALL GetAllActiveVolunteerEmails()"); 
     $stmt->execute();
     $result = $stmt->get_result();
     $rows = $result->fetch_all(MYSQLI_ASSOC);
     if ($result->num_rows > 0) {
-      foreach ($rows as $row) {
-        $email = $row["email"];
-        array_push($emailArray, $email);
-      }
+        foreach ($rows as $row) {
+            $email = $row["email"];
+            array_push($emailArray, $email);
+        }
     }
     return $emailArray;
+}
+//Alex
+public static function GetUnassignedVolunteerEmails(){
+  global $con;
+  $emailArray = array();
+  $stmt = $con->prepare("CALL GetUnassignedVolunteers()");
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $rows = $result->fetch_all(MYSQLI_ASSOC);
+  if ($result->num_rows > 0) {
+      foreach ($rows as $row) {
+          $volunteers = ["volunteerId" => $row["volunteerId"], "email" => $row["email"]];
+          array_push($emailArray, $volunteers);
+      }
   }
+  return $emailArray;
+}
+
 
   //JEFFERY
   //calls the function to get all active Volunteer emails and returns a formatted string for options in a select box to employee.php
@@ -294,7 +311,17 @@ class Volunteer
     foreach ($emails as $email) {
       $volunteerEmails .= "<option value='$email'>$email</option>";
     }
-    return $volunteerEmails;
+    return "$volunteerEmails";
+  }
+  //Alex
+  public static function GetUnassignedVolunteersFormatted()
+  {
+    $volunteers = Volunteer::GetUnassignedVolunteerEmails();
+    $volunteerOptions = "";
+    foreach ($volunteers as $volunteer) {
+        $volunteerOptions .= "<option value='{$volunteer["volunteerId"]}'>{$volunteer["email"]}</option>";
+    }
+    return $volunteerOptions;
   }
 
   //  JEREMY
@@ -328,7 +355,39 @@ class Volunteer
     $stmt->close();
     return $response;
   }
+  //Alex
+  public static function GetHistoryByAdmin(int $volunteerId)
+  {
+    global $con;
+    $stmt = $con->prepare('CALL GetVolunteerHistory(?)');
+    $stmt->bind_param('i', $volunteerId);
+    $stmt->execute();
+    $response = "<div class='volunteer_history'>";
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+      $response .= "<table class='table table-striped my-3'><thead class='table-dark'><th>Document</th><th>Work Started</th><th>Work Completed</th><th>Role</th><th><action></th></thead>";
+      while (list($startDate, $endDate, $doc_status, $doc_name, $doc_id) = $result->fetch_row()) {
+        if ($endDate) { //skips displaying what the volunteer is currently working on
+          $response .= <<<_HISTORY
+          <tr id="history_$doc_id">
+            <td>$doc_name</td>
+            <td>$startDate</td>
+            <td>$endDate</td>
+            <td>$doc_status</td>
+            <td><button type='button' id="btnView$doc_id" class="btn btn-dark btn-sm btn-view">View</button></td>
 
+          </tr>
+          _HISTORY;
+        }
+      } //end while
+      $response .= "</table>";
+    } else {
+      $response .= "No work history";
+    }
+    $response .= "</div>"; //close volunteer_history div
+    $stmt->close();
+    return $response;
+  }
   //JEREMY
   public static function GetActiveDocumentId(Volunteer $volunteer)
   {
@@ -341,6 +400,20 @@ class Volunteer
     $stmt->close();
     return $historyId;
   }
+  //Alex
+  public static function GetActiveHistoryId(int $volunteerId)
+{
+    global $con;
+    $stmt = $con->prepare('CALL GetActiveDocumentId(?)');
+    $stmt->bind_param('i', $volunteerId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_row();
+    $historyId = $row[1] ?? -1; // Use index 1 to fetch the second column (historyId)
+    $stmt->close();
+    return $historyId;
+}
+  
 
 
 

@@ -682,7 +682,6 @@ try {
         <button class="uTabLinks" onclick="openUploadTab(event, 'addCollection')">Create Collection</button>
         <button class="uTabLinks" onclick="openUploadTab(event, 'updateCollection')">Update Collection</button>
         <button class="uTabLinks" onclick="openUploadTab(event, 'removeDoc')">Remove Document</button>
-        <button class="uTabLinks" onclick="openUploadTab(event, 'removeScannedDoc')">Remove Scanned Document</button>
         <button class="uTabLinks" onclick="openUploadTab(event, 'renameDocTab')">Change Document Name</button>
 
       </div>
@@ -1119,43 +1118,6 @@ try {
     </div>
 
     <!-------ROSA-------->
-    <!--REMOVE SCANNED DOCUMENT-->
-    <div id="removeScannedDoc" class="uTabContent" style="display: none;">
-        Need to remove a scanned document? <BR>
-        <form action='deleteScannedDoc_proc.php' method='POST'>
-          Please select the collection:
-          <select id="scannedRemove" name="scannedRemove" required="required" onchange="ShowDocumentss(this.value)">
-            <!-- this is to put the "required"to work, and because without it, when the page first load, the first collection 
-            was selected but checkbox images were displayed. This forces the user to select something and update the checkboxes -->
-            <option value="">Select Collection</option>
-            <?php print(Collection::GetCollectionsDropDown()); ?>
-          </select>
-
-          <table id="documentssByCollectionCHK" name='documentssByCollectionCHK'>
-
-          </table>
-          <input type="submit" name="removeScannedDoc" value="Remove Scanned Document(s)">
-        </form>
-      </div>
-
-      <script>
-        function ShowDocumentss(collId) {
-          if (collId.length == 0) {
-            document.getElementById("documentssByCollectionCHK").innerHTML = "";
-            return;
-          } else {
-            const xmlhttp = new XMLHttpRequest();
-            xmlhttp.onload = function() {
-              document.getElementById("documentssByCollectionCHK").innerHTML = this.responseText;
-            }
-            xmlhttp.open("GET", "removeDoc_AJAX.php?q=" + collId);
-            xmlhttp.send();
-          }
-        }
-      </script>
-
-
-    </div>
 
     <!--CHANGE DOCUMENT NAME-->
     <div id="renameDocTab" class="uTabContent"  style="display: none;">

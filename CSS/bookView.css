@@ -9,11 +9,13 @@
     transition: background-color 0.3s ease;
   }
   
-  #prevPage:hover, #nextPage:hover {
+  #prevPage:hover, #nextPage:hover  {
     background-color: #b98a56;
   }
-  
-  #prevPage, #nextPage {
+  #closeDialog:hover  {
+    background-color: #b95956;
+  }
+  #prevPage, #nextPage, #closeDialog{
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -45,7 +47,7 @@
     background-color: #f4f1ea;
   }
   
-  #prevPage, #nextPage {
+  #prevPage, #nextPage, #closeDialog {
     display: inline-block;
     margin: 20px 10px;
   }

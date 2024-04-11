@@ -6,20 +6,20 @@ include ("./CLASSES/Volunteer.php");
 include ("./CLASSES/Employee.php");
 
 session_start();
-if (!isset ($_SESSION['volunteer'])) {
-  if (!isset ($_SESSION['employee'])) {
-    if (!isset ($_POST['viewTranscribedDocId'])) {
+if (!isset($_SESSION['volunteer'])) {
+  if (!isset($_SESSION['employee'])) {
+    if (!isset($_POST['viewTranscribedDocId'])) {
       header('location:index.php');
     }
   }
 }
 
-if (isset ($_GET['msg'])) {
+if (isset($_GET['msg'])) {
   $msg = $_GET['msg'];
   echo "<script>alert($msg)</script>";
 }
 
-if (isset ($_SESSION['volunteer'])) {
+if (isset($_SESSION['volunteer'])) {
   $volunteer = $_SESSION['volunteer'];
   $document = Document::getDocumentById($volunteer->activeDocId);
   $currentWorkHistoryId = Volunteer::GetActiveDocumentId($volunteer);
@@ -36,7 +36,7 @@ if (isset ($_SESSION['volunteer'])) {
 
 }
 
-if (isset ($_SESSION['employee'])) {
+if (isset($_SESSION['employee'])) {
 
   $empId = $_SESSION['employee'];
   $document = Document::getDocumentByEmpId($empId);
@@ -46,7 +46,7 @@ if (isset ($_SESSION['employee'])) {
   $blockNotes = '';
 }
 
-if (isset ($_POST['viewTranscribedDocId'])) {
+if (isset($_POST['viewTranscribedDocId'])) {
   $docId = $_POST['viewTranscribedDocId'];
   $document = Document::getDocumentById($docId);
   $btnHome = '<button title="Go to View Transcribed Documents page" type="button" class="btn btn-primary" id="btnViewTranscDocHome"> <i class="material-icons">house</i> </button>';
@@ -108,12 +108,13 @@ if (isset ($_POST['viewTranscribedDocId'])) {
       <dialog id="bookViewDialog">
         <h2>Book View</h2>
         <div id="book"></div>
+        <div id="pageNumber" style="text-align: center; font-size: 16px; margin-top: 10px;"></div>
         <button title="Close Viewer" type="button" class="btn btn-primary" id="closeDialog"> <i
-                class="material-icons">close</i> </button>
-        <button title="Next page" type="button" class="btn btn-primary" id="prevPage"> <i
-                class="material-icons">chevron_left</i> </button>
+            class="material-icons">close</i> </button>
+        <button title="Previous page" type="button" class="btn btn-primary" id="prevPage"> <i
+            class="material-icons">chevron_left</i> </button>
         <button title="Next page" type="button" class="btn btn-primary" id="nextPage"> <i
-                class="material-icons">chevron_right</i> </button>
+            class="material-icons">chevron_right</i> </button>
       </dialog>
       <!-------------------------------------------------->
       <div class="row mt-2 mb-2 border">
@@ -127,15 +128,15 @@ if (isset ($_POST['viewTranscribedDocId'])) {
           <div class="row">
             <?php echo $strDaysRemaining; ?>
           </div>
-<!--------Rosa------>
+          <!--------Rosa------>
           <div class="row">
-          <?php
-            
-              Document::SaveChangeNameButton($document->docId) 
-          ?>
-          
-          </div> 
-<!--------Rosa------>
+            <?php
+
+            Document::SaveChangeNameButton($document->docId)
+              ?>
+
+          </div>
+          <!--------Rosa------>
           <div class="row">
             <div class="mb-3">
               <label for="txtTranscription" class="form-label">Transcription</label>
@@ -205,49 +206,59 @@ if (isset ($_POST['viewTranscribedDocId'])) {
   <script src="./JS/jsPDF-1.3.2/plugins/split_text_to_size.js"></script>
   <script src="./JS/turn.js-master/turn.min.js"></script>
   <script>
-    
-  function initializeTurnJsBook() {
-    // Check the pdfarray
-    if (!window.pdfArray || !window.pdfArray.images || window.pdfArray.images.length === 0) {
+
+    function initializeTurnJsBook() {
+      // Check the pdfarray
+      if (!window.pdfArray || !window.pdfArray.images || window.pdfArray.images.length === 0) {
         console.log('No images available for Turn.js book.');
         return;
-    }
+      }
 
-    console.log('PDF Array:', window.pdfArray);
+      console.log('PDF Array:', window.pdfArray);
 
-    // Empty the container element
+      // Empty the container element
       $('#book').empty();
 
-    // Create and append image elements to the book container
-    window.pdfArray.images.forEach(imageUrl => {
+      // Create and append image elements to the book container
+      window.pdfArray.images.forEach((imageUrl, index) => {
         console.log('Adding page with image URL:', imageUrl);
-        const pageElement = $('<div class="hard"></div>'); // Use "hard" for hardcover effect
-        const imgElement = $('<img>').attr('src', imageUrl).css({width: '100%', height: '100%'});
-        pageElement.append(imgElement);
-        $('#book').append(pageElement); // Append page to the book container directly
-    });
+        const pageElement = $('<div class="hard" style="position: relative;"></div>'); 
+        const imgElement = $('<img>').attr('src', imageUrl).css({ width: '100%', height: '100%' });
 
-    // Initialize Turn.js on the book element
-    $('#book').turn({
+        // Create page number for each page
+        const pageNumberDiv = $('<div></div>').css({
+          position: 'absolute',
+          bottom: '5px',
+          right: '5px',
+          color: '#FFF', 
+          backgroundColor: 'rgba(0, 0, 0, 0.6)', 
+          fontSize: '12px',
+          padding: '2px 4px', 
+          borderRadius: '4px', 
+        }).text(index + 1); 
+
+        pageElement.append(imgElement).append(pageNumberDiv);
+        $('#book').append(pageElement); // Append page to the book container directly
+      });
+      // Initialize Turn.js on the book element
+      $('#book').turn({
         width: 800,
         height: 500,
         autoCenter: true
-    });
+      });
 
-    $('#prevPage').click(function() {
+      $('#prevPage').click(function () {
         $('#book').turn('previous'); // Turn to the previous page
-    });
+      });
 
-    // Event listener for the "Next Page" button
-    $('#nextPage').click(function() {
+      $('#nextPage').click(function () {
         $('#book').turn('next'); // Turn to the next page
-    });
-}
-
-</script>
-<style>
-</style>
-<script src="./JS/transcription.js"></script>
+      });
+    }
+  </script>
+  <style>
+  </style>
+  <script src="./JS/transcription.js"></script>
   <?php
   echo $blockTranscription;
   echo $blockNotes

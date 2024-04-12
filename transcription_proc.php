@@ -91,6 +91,7 @@ if (isset($_POST["createOSDCanva"])) {
 //this code will do: 
 //1. Get the actual file path and name opened at openSeaDragon viewer
 //2. return the text file content as response.
+
 if (isset($_POST["getTxtDataByFilePath"])) {
   $imageFilePath = $_POST["getTxtDataByFilePath"]; // ./UPLOADS/test/gog.jpg
   $textFileName = getTextFilePath($imageFilePath, "t");

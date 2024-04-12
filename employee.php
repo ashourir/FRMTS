@@ -459,79 +459,103 @@ if (isset($_GET["msg"])) {
       }
     }
     
-       async function populateViewTranscription(docId){
-          let modal = document.querySelector("#modalViewTransc")
-         
-          let txtDesc = document.querySelector("#txtDesc")
-          let txtNotes = document.querySelector("#txtNotes")
-          let folderName = await getFolderName(docId)
-          let docName = await getDocName(docId)
-          modal.showModal()
-          modal.addEventListener('cancel', (event)=> {
-            event.preventDefault()
-          })
-          document.querySelector('#lblDocName').innerText = docName
-          //add event listener to close the modal
-          let btnClose = document.querySelector('#btnDocClose')
-          btnClose.addEventListener('click', ()=>{
-            document.querySelector('#openseadragon1').innerHTML = ''
-            modal.close()
-          })
-          $.ajax({
-    type: "POST",
-    url: "transcription_proc.php",
-    data: {
-     
-      createOSDCanva: folderName
-    },
-    // dataType: "dataType",
-    success: (arrayOfImages) => {
-      let formatedImagesArray = createImageArray(arrayOfImages);
-      if(formatedImagesArray.length > 0){
-        var viewer = createOSDViewer(formatedImagesArray);
-        let transcription = joinTranscText(arrayOfImages, 'transc')
-        txtDesc.innerHTML = transcription
-        let notes = joinTranscText(arrayOfImages, 'notes')
-        txtNotes.innerHTML = notes
+  // Define openHandler globally
+function openHandler(viewer) {
+    return function() {
+        currentImage = viewer.world.getItemAt(0);
+        filePath = currentImage.source.url;
+        
+        // AJAX request for transcription data
+        $.ajax({
+            type: "POST",
+            url: "./transcription_proc.php",
+            data: { getTxtDataByFilePath: filePath },
+            success: function(res) {
+                txtDesc.innerHTML = res;
+            }
+        });
 
-        viewer.addHandler("page", (event)=>{
-        let transcription = joinTranscText(arrayOfImages, 'transc', event.page)
-        let notes = joinTranscText(arrayOfImages, 'notes', event.page)
-        txtDesc.innerHTML = transcription
-        txtNotes.innerHTML = notes
-      })
-      }
-      else {
-        alert("The document selected has no images")
-        btnClose.click()
-      }
-      
+        // AJAX request for notes data
+        $.ajax({
+            type: "POST",
+            url: "transcription_proc.php",
+            data: { getTxtNotesDataByFilePath: filePath },
+            success: function(res) {
+                console.log(res);
+                txtNotes.innerHTML = res;
+            }
+        });
+    };
+}
 
-     
-    }
-  })
+async function populateViewTranscription(docId) {
+    let modal = document.querySelector("#modalViewTransc");
+    let txtDesc = document.querySelector("#txtDesc");
+    let txtNotes = document.querySelector("#txtNotes");
+    let folderName = await getFolderName(docId);
+    let docName = await getDocName(docId);
 
-      }
+    modal.showModal();
+    modal.addEventListener('cancel', (event) => {
+        event.preventDefault();
+    });
+
+    document.querySelector('#lblDocName').innerText = docName;
+
+    let btnClose = document.querySelector('#btnDocClose');
+
+    $.ajax({
+        type: "POST",
+        url: "transcription_proc.php",
+        data: {
+            createOSDCanva: folderName
+        },
+        success: (arrayOfImages) => {
+            let formatedImagesArray = createImageArray(arrayOfImages);
+            if (formatedImagesArray.length > 0) {
+                var viewer = createOSDViewer(formatedImagesArray);
+
+                // Add the openHandler function as the event handler
+                viewer.addHandler("open", openHandler(viewer));
+
+                btnClose.addEventListener('click', () => {
+                  document.querySelector("#openseadragon1").innerHTML = ""
+                  viewer.removeAllHandlers()
+                  
+                    modal.close();
+                    // Remove the openHandler
+                    viewer.removeHandler('open', openHandler);
+                });
+            } else {
+                alert("The document selected has no images");
+                btnClose.click();
+            }
+        }
+    });
+}
+
+
     
     
       //function to create formatted array of images
       function createImageArray(arrayOfImages) {
        
-  let formatedImagesArray = [];
-  let resParsed = JSON.parse(arrayOfImages);
-  resParsed.images.forEach(path => {
-    formatedImagesArray.push(
-      {
-        type: "image",
-        url: path
-      }
-    )
-  });
-  return formatedImagesArray;
+          let formatedImagesArray = [];
+          let resParsed = JSON.parse(arrayOfImages);
+          resParsed.images.forEach(path => {
+            formatedImagesArray.push(
+              {
+                type: "image",
+                url: path
+              }
+            )
+          });
+          return formatedImagesArray;
 }
 
 //function to create viewer
 function createOSDViewer(images) {
+  
   //create the openseadragon viewer
   var viewer = OpenSeadragon({
     id: 'openseadragon1',
@@ -553,18 +577,7 @@ function createOSDViewer(images) {
 }
 
 
-function joinTranscText(imagesObj, mode, page = 0) {
- let obj = JSON.parse(imagesObj) //it takes the string formart and converts it to JS obj
-    if(mode === 'transc'){
-      obj.transcText[0] = obj.transcText[0].replace(/^\n/, '');
-    return obj.transcText[page];
-    }
-    else if (mode === 'notes'){
-      obj.notesText[0] = obj.notesText[0].replace(/^\n/, '');
-    return obj.notesText[page]
-    }
-    
-}
+
 
 
 //Alex Function to visualize work done by volunteer
@@ -1167,7 +1180,6 @@ try {
         radioButtons.forEach(function(radioButton) {
           radioButton.addEventListener("change", function() {
             const docId = this.value; // Get the value (docId) of the selected radio button
-            console.log("Selected docId:", docId);
             document.getElementById("docId").value = docId;
 
             // You can perform further actions with the selected docId, like passing it to another function
@@ -1242,13 +1254,13 @@ try {
         <div class="d-flex flex-column my-2 mx-2 h-100 w-100">
           <textarea readonly rows="12" class="my-2" id='txtDesc'></textarea>
           <textarea readonly rows="5" class="my-2" id='txtNotes'></textarea>
-          <div class="btn-group my-1" role="group" aria-label="Basic example">
+          <!--<div class="btn-group my-1" role="group" aria-label="Basic example">
               <button title="Previous page" type="button" class="btn btn-primary" id="btnPrev"> <i
                   class="material-icons">chevron_left</i> </button>
               </button>
               <button title="Next Page" type="button" class="btn btn-primary" id="btnNext"> <i
                   class="material-icons">chevron_right</i> </button>
-        </div>
+        </div>-->
           <button id="btnDocClose" class="btn btn-dark">Close</button>
         </div>
     </div>

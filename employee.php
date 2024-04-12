@@ -481,7 +481,6 @@ function openHandler(viewer) {
             url: "transcription_proc.php",
             data: { getTxtNotesDataByFilePath: filePath },
             success: function(res) {
-                console.log(res);
                 txtNotes.innerHTML = res;
             }
         });

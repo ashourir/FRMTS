@@ -757,7 +757,7 @@ public static function GetAllAvailableDocumentsVolunteersAsHtmlTable(){
     $html .= '<button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton'.$row['documentId'].'" data-bs-toggle="dropdown" aria-expanded="false">Actions</button>';
     $html .= '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton'.$row['documentId'].'">';
     $html .= '<li><a class="dropdown-item" href="#" onclick="GenerateReassignModal(\'volunteer\', \'' . $row['volunteerId'] . '\', \'' . $row['documentId'] . '\', \'' . $row['statusId'] . '\')">Reassign task</a></li>';
-    $html .= '<li><a class="dropdown-item" href="#" onclick="ViewWorkDoneByVolunteer(\'' . $row['volunteerId'] . '\')">View work done by user</a></li>';
+    $html .= '<li><a class="dropdown-item" href="#" onclick="ViewWorkDoneByVolunteer(\'' . $row['volunteerId'] . '\')">View previous work of the user</a></li>';
     $html .= '</ul>';
     $html .= '</td>';
 

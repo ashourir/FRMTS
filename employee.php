@@ -487,18 +487,25 @@ if (isset($_GET["msg"])) {
     // dataType: "dataType",
     success: (arrayOfImages) => {
       let formatedImagesArray = createImageArray(arrayOfImages);
-      var viewer = createOSDViewer(formatedImagesArray);
-      let transcription = joinTranscText(arrayOfImages, 'transc')
-      txtDesc.innerHTML = transcription
-      let notes = joinTranscText(arrayOfImages, 'notes')
-      txtNotes.innerHTML = notes
+      if(formatedImagesArray.length > 0){
+        var viewer = createOSDViewer(formatedImagesArray);
+        let transcription = joinTranscText(arrayOfImages, 'transc')
+        txtDesc.innerHTML = transcription
+        let notes = joinTranscText(arrayOfImages, 'notes')
+        txtNotes.innerHTML = notes
 
-      viewer.addHandler("page", (event)=>{
+        viewer.addHandler("page", (event)=>{
         let transcription = joinTranscText(arrayOfImages, 'transc', event.page)
         let notes = joinTranscText(arrayOfImages, 'notes', event.page)
         txtDesc.innerHTML = transcription
         txtNotes.innerHTML = notes
       })
+      }
+      else {
+        alert("The document selected has no images")
+        btnClose.click()
+      }
+      
 
      
     }
@@ -583,7 +590,7 @@ async function ViewWorkDoneByVolunteer(volunteerId){
   let workTable = await fetchHistory(volunteerId)
  
 
-  modal.innerHTML = '<button id="btnWorkDoneClose" type="button" class="btn btn-dark">Close</button>'
+  modal.innerHTML = '<button id="btnWorkDoneClose" type="button" class="btn btn-dark btn-sm">X</button>'
 
   modal.innerHTML += workTable
   const buttons = document.querySelectorAll('.btn-view');
@@ -615,7 +622,7 @@ btnClose.addEventListener('click', () => {
 //Alex
 //Scripts for populating volunteer list
 async function PopulateVolunteerList(){
-  let html = "<table class='table table-striped'><thead class='table-dark'><th>Volunteer Id</th><th>Email</th><th>isActive</th><th>Action</th></thead><tbody>";
+  let html = "<table class='table table-striped'><thead class='table-dark'><th>Volunteer Id</th><th>Email</th><th>Status</th><th>Action</th></thead><tbody>";
 let slcMode = document.querySelector('#slcVolunteerMode');
 let mode = slcMode.value;
 
@@ -634,8 +641,9 @@ try {
       html += "<tr>";
       html += `<td>${row.volunteerId}</td>`;
       html += `<td>${row.email}</td>`;
-      html += `<td>${row.isActive}</td>`;
-      html += `<td><button class='btn btn-dark btn-sm' onclick='ViewWorkDoneByVolunteer(${row.volunteerId})'>View Work Done</button></td>`;
+      //html += `<td>${row.isActive}</td>`;
+      html += `<td>${row.isActive?'Active':"Inactive"}</td>`;
+      html += `<td><button class='btn btn-dark btn-sm' onclick='ViewWorkDoneByVolunteer(${row.volunteerId})'>View  previous work</button></td>`;
       html += "</tr>";
 });
 
@@ -1216,7 +1224,7 @@ try {
     
   </div>
    <!-- View current Transcription Dialog-->
-   <dialog id="modalWorkDone" class="text-center">
+   <dialog id="modalWorkDone" class="text-end">
     
 
     <div>

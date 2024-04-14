@@ -395,7 +395,7 @@ public static function GetUnassignedVolunteerEmails(){
     $response = "<div class='volunteer_history'>";
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
-      $response .= "<table class='table table-striped my-3'><thead class='table-dark'><th>Document</th><th>Work Started</th><th>Work Completed</th><th>Role</th><th><action></th></thead>";
+      $response .= "<table class='table table-striped my-3'><thead class='table-dark'><th>Document</th><th>Work Started</th><th>Work Completed</th><th>Status</th><th><action></th></thead>";
       while (list($startDate, $endDate, $doc_status, $doc_name, $doc_id) = $result->fetch_row()) {
         if ($endDate) { //skips displaying what the volunteer is currently working on
           $response .= <<<_HISTORY
